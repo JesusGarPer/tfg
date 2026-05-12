@@ -2,10 +2,11 @@ name: PR Title Validation
 
 on:
   pull_request:
-    types: [opened, edited, synchronize, reopened]
-    branches:
-      - main
-      - 'sprint*'
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
 
 permissions:
   pull-requests: read
@@ -15,11 +16,8 @@ jobs:
     name: Validate conventional PR title
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@11ed46005021b61421b240a1216368383573d41e
-
       - name: Check PR title
-        uses: amannn/action-semantic-pull-request@070359677519a795e1c070e6378e90638e104005
+        uses: amannn/action-semantic-pull-request@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
