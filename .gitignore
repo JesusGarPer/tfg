@@ -1,0 +1,14 @@
+# Entornos virtuales
+venv/
+.venv/
+env/
+
+# Datos (No subimos el CSV gigante a GitHub)
+data/raw/*.csv
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Python cache
+__pycache__/
+*.py[cod]
