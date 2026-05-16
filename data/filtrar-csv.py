@@ -9,7 +9,7 @@ RAW_DIR = BASE_DIR / "data" / "raw"
 FILTERED_DIR = BASE_DIR / "data" / "filtered"
 FILTERED_DIR.mkdir(parents=True, exist_ok=True)
 
-años = ["2021", "2022", "2023", "2024", "2025"]
+años = ["2021", "2022", "2023", "2024", "2025", "2026"]
 
 for año in años:
     ruta_raw = RAW_DIR / f"data-{año}.csv"
