@@ -1,0 +1,31 @@
+services:
+  # 1. BASE DE DATOS
+  postgres_db:
+    image: postgres:15-alpine
+    container_name: lol_predict_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # 2. BACKEND (Preparado para más adelante)
+  # backend:
+  #   build: ./backend
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #     - postgres_db
+
+  # 3. FRONTEND (Preparado para más adelante)
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #     - "8501:8501"
+
+volumes:
+  postgres_data:
