@@ -1,0 +1,20 @@
+repos:
+  # 1. Vigila el mensaje del commit
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.18.3
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+  # 2. Limpia espacios en blanco vacíos y asegura saltos de línea al final del archivo
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+
+  # 3. Formateador Black (Arregla tu código Python automáticamente)
+  - repo: https://github.com/psf/black
+    rev: 24.2.0
+    hooks:
+      - id: black
