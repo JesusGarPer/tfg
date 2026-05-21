@@ -2,7 +2,7 @@ import os
 import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 from contextlib import asynccontextmanager
 from app.models_ml import cargar_modelo
 from app.routes import prediction, data_api
@@ -17,9 +17,10 @@ async def lifespan(app: FastAPI):
         logger.info("Iniciando servicio y cargando artefactos de Machine Learning...")
         cargar_modelo()
         app.state.model_loaded = True
-    except Exception as e:
-        logger.error(f"Error crítico al cargar el modelo: {e}")
+    except Exception:
         app.state.model_loaded = False
+        logger.exception("Error crítico al cargar el modelo")
+        raise RuntimeError("El modelo no pudo ser cargado correctamente.")
 
     yield
 
@@ -35,15 +36,15 @@ app = FastAPI(
 )
 
 # Configuración del CORS (Vital para que tu Frontend React en local pueda consumir la API)
-# Leemos los orígenes permitidos desde las variables de entorno, o usamos "*" como fallback genérico para desarrollo.
-ALLOWED_ORIGINS = os.getenv("CORS_ORIGINS", "*").split(",")
+# localhost durante el desarrollo, agregar url en producción (ej: CORS_ORIGINS=https://tu-frontend.vercel.app)
+ALLOWED_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "Accept"],
 )
 
 # Incluimos las rutas de predicción de la carpeta /routes
@@ -60,9 +61,22 @@ def read_root():
 @app.get("/health", tags=["Health"])
 def health_check():
     """Ruta para comprobar que el contenedor o servidor está ejecutándose correctamente y tiene los modelos listos."""
-    status_model = "ready" if app.state.model_loaded else "unavailable"
+    model_loaded = getattr(app.state, "model_loaded", False)
+
+    if not model_loaded:
+        # Si el modelo falla, devolvemos un error 503 para que Docker lo sepa
+        return JSONResponse(
+            status_code=503,
+            content={
+                "status": "degraded",
+                "model_status": "unavailable",
+                "message": "API activa, pero el modelo de ML no se pudo cargar.",
+            },
+        )
+
+    # Si todo va bien, FastAPI devuelve un 200 OK por defecto
     return {
         "status": "online",
-        "model_status": status_model,
+        "model_status": "ready",
         "message": "API de Predicción de la LEC operativa.",
     }

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from pydantic import BaseModel
@@ -83,7 +83,9 @@ def procesar_equipo(
 
     # Variables directas del formulario
     playoffs = datos_equipo["playoffs"]
-    side = datos_equipo["side"]
+
+    # Evitamos errores en peticiones por JSON en la variable side
+    side = "Blue" if is_blue else "Red"
 
     # Usando el nuevo enfoque de "Blue", "Red" o "None"
     if form_stats["first_dragon_team"] == "Blue" and is_blue:
@@ -178,7 +180,11 @@ def procesar_equipo(
 def obtener_metricas_bd(db: Session):
     """Extrae todos los diccionarios de métricas históricas de la DB."""
     if not db:
-        return {}
+        # Falla rápido y claro: si no hay DB, detenemos la petición HTTP con un error 503
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Servicio degradado: No hay conexión con la base de datos de métricas.",
+        )
 
     stats = {"teams": {}, "players": {}, "champs_wr": {}, "champs_early": {}}
 

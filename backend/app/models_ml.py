@@ -34,11 +34,12 @@ def cargar_modelo():
                 "✅ Artefactos de ML (modelo, scaler, encoders) cargados correctamente en memoria."
             )
         else:
-            logger.error(
-                "❌ Faltan algunos archivos .pkl en la ruta del modelo. Asegúrate de ejecutar el notebook primero."
+            raise FileNotFoundError(
+                "Faltan algunos archivos .pkl en la ruta del modelo. Asegúrate de ejecutar el notebook previo."
             )
-    except Exception as e:
-        logger.error(f"❌ Error al cargar los artefactos de ML: {str(e)}")
+    except Exception:
+        logger.exception("❌ Error crítico al intentar cargar los artefactos de ML")
+        raise
 
 
 def ejecutar_inferencia(datos_entrada_dict):
@@ -57,13 +58,11 @@ def ejecutar_inferencia(datos_entrada_dict):
         if col in datos_procesados:
             valor_str = str(datos_procesados[col])
 
-            # Si el valor no fue visto durante el entrenamiento se asigna una clase por defecto para evitar errores en la transformación
+            # Si el valor no fue visto durante el entrenamiento, detenemos la inferencia y lanzamos un error claro
             if valor_str not in le.classes_:
-                logger.warning(
-                    f"Valor desconocido '{valor_str}' para '{col}'. Asignando clase por defecto."
+                raise ValueError(
+                    f"Valor desconocido '{valor_str}' para la variable '{col}'."
                 )
-                # Asignamos la primera clase disponible en el codificador para evitar error de transform
-                valor_str = le.classes_[0]
 
             datos_procesados[col] = le.transform([valor_str])[0]
 

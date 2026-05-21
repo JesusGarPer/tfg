@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Dict
+from typing import Literal
 
 
 class PlayerData(BaseModel):
@@ -7,11 +7,19 @@ class PlayerData(BaseModel):
     campeon: str
 
 
+class TeamPlayers(BaseModel):
+    top: PlayerData
+    jng: PlayerData
+    mid: PlayerData
+    bot: PlayerData
+    sup: PlayerData
+
+
 class TeamData(BaseModel):
     teamname: str
     playoffs: int
-    side: str
-    jugadores: Dict[str, PlayerData]
+    side: Literal["Blue", "Red"]
+    jugadores: TeamPlayers
 
 
 class MatchStats15(BaseModel):
@@ -27,7 +35,7 @@ class MatchStats15(BaseModel):
 
 
 class MatchRequest(BaseModel):
-    first_dragon_team: str
+    first_dragon_team: Literal["Blue", "Red", "None"]
     stats_min_15: MatchStats15
     equipo_azul: TeamData
     equipo_rojo: TeamData
