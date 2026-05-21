@@ -13,13 +13,18 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # 2. BACKEND (Preparado para más adelante)
-  # backend:
-  #   build: ./backend
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     - postgres_db
+  # 2. BACKEND
+  backend:
+    build: ./backend
+    container_name: lol_predict_backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres_db
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: postgres_db
 
   # 3. FRONTEND (Preparado para más adelante)
   # frontend:
