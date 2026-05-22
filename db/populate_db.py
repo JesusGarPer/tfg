@@ -14,11 +14,13 @@ env_path = os.path.join(BASE_DIR, ".env")
 load_dotenv(env_path)
 
 # Variables de la base de datos
-DB_USER = os.getenv("POSTGRES_USER", "lol_user")
-DB_PASS = os.getenv("POSTGRES_PASSWORD", "lol_password")
-DB_NAME = os.getenv("POSTGRES_DB", "lol_predict_db")
-DB_HOST = "localhost"  # Cambiar a 'postgres_db' si este script se dockeriza en el futuro (cuando haya backend en Docker)
-DB_PORT = "5432"
+DB_USER = os.getenv("POSTGRES_USER")
+DB_PASS = os.getenv("POSTGRES_PASSWORD")
+DB_NAME = os.getenv("POSTGRES_DB")
+DB_HOST = os.getenv(
+    "POSTGRES_HOST", "localhost"
+)  # Cambiar a 'postgres_db' si este script se dockeriza en el futuro
+DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 
 
 # 2. CONEXIÓN A POSTGRESQL CON SQLALCHEMY

@@ -8,18 +8,29 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # 2. BACKEND (Preparado para más adelante)
-  # backend:
-  #   build: ./backend
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     - postgres_db
+  # 2. BACKEND
+  backend:
+    build: ./backend
+    container_name: lol_predict_backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: postgres_db
 
   # 3. FRONTEND (Preparado para más adelante)
   # frontend:

@@ -1,0 +1,16 @@
+# Ignorar carpetas de caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignorar entornos virtuales
+venv/
+.venv/
+env/
+
+# Ignorar archivos de entorno locales (las variables se pasarán al contenedor en ejecución)
+.env
+
+# Ignorar archivos de OS
+.DS_Store
+Thumbs.db
