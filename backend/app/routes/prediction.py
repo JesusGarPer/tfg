@@ -251,6 +251,10 @@ async def predict_full_match(match_data: MatchRequest, db: Session = Depends(get
     except ValueError as ve:
         logger.error(f"Error de validación en /predict-match: {str(ve)}")
         raise HTTPException(status_code=400, detail=str(ve))
+    except HTTPException as he:
+        # Si el error ya es HTTP (ej: el 503 de la BD), lo registramos y lo dejamos pasar intacto
+        logger.error(f"Error HTTP controlado en la predicción: {he.detail}")
+        raise he
     except Exception as e:
         logger.error(f"Excepción en /predict-match: {str(e)}")
         raise HTTPException(
