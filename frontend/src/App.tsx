@@ -29,9 +29,10 @@ function App() {
       <div className="flex flex-col md:flex-row gap-6 max-w-5xl w-full justify-center px-4">
 
         {/* Card 1: Prepartida */}
-        <div
+        <button
+          type="button"
           onClick={() => setView('prematch')}
-          className="relative flex-1 bg-[#0F121C] border border-purple-500/20 rounded-2xl p-10 hover:border-purple-500/50 transition-all duration-300 hover:shadow-[0_0_40px_rgba(168,85,247,0.1)] cursor-pointer overflow-hidden group"
+          className="relative block w-full text-left flex-1 bg-[#0F121C] border border-purple-500/20 rounded-2xl p-10 hover:border-purple-500/50 transition-all duration-300 hover:shadow-[0_0_40px_rgba(168,85,247,0.1)] cursor-pointer overflow-hidden group focus:outline-none focus:ring-2 focus:ring-purple-500/50"
         >
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
@@ -51,12 +52,13 @@ function App() {
               <span className="text-xs text-gray-400">Sin estadísticas en tiempo real</span>
             </div>
           </div>
-        </div>
+        </button>
 
         {/* Card 2: Minuto 15 */}
-        <div
+        <button
+          type="button"
           onClick={() => setView('min15')}
-          className="relative flex-1 bg-[#0F121C] border border-cyan-500/20 rounded-2xl p-10 hover:border-cyan-500/50 transition-all duration-300 hover:shadow-[0_0_40px_rgba(34,211,238,0.1)] cursor-pointer overflow-hidden group"
+          className="relative block w-full text-left flex-1 bg-[#0F121C] border border-cyan-500/20 rounded-2xl p-10 hover:border-cyan-500/50 transition-all duration-300 hover:shadow-[0_0_40px_rgba(34,211,238,0.1)] cursor-pointer overflow-hidden group focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
         >
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
@@ -76,7 +78,7 @@ function App() {
               <span className="text-xs text-gray-400">Incluye datos en tiempo real</span>
             </div>
           </div>
-        </div>
+        </button>
 
       </div>
 

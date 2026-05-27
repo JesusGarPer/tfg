@@ -35,13 +35,13 @@ export default function Min15Prediction({ onBack }: Props) {
               <span className="w-2 h-2 rounded-full bg-cyan-400"></span> Equipo Azul
             </h3>
             <div className="mb-6">
-              <label className="text-xs text-gray-500 block mb-1">Nombre del Equipo</label>
-              <select className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-cyan-500/50 outline-none">
+              <label htmlFor="blue-team-name" className="text-xs text-gray-500 block mb-1">Nombre del Equipo</label>
+              <select id="blue-team-name" className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-cyan-500/50 outline-none">
                 <option>Seleccionar equipo...</option>
               </select>
             </div>
             <div>
-              <label className="text-xs text-gray-500 block mb-3">Composición (5 jugadores)</label>
+              <div className="text-xs text-gray-500 block mb-3">Composición (5 jugadores)</div>
               <div className="grid grid-cols-5 gap-2">
                 {ROLES.map(role => (
                   <div key={role} className="flex flex-col gap-2">
@@ -64,13 +64,13 @@ export default function Min15Prediction({ onBack }: Props) {
               <span className="w-2 h-2 rounded-full bg-red-400"></span> Equipo Rojo
             </h3>
             <div className="mb-6">
-              <label className="text-xs text-gray-500 block mb-1">Nombre del Equipo</label>
-              <select className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-red-500/50 outline-none">
+              <label htmlFor="red-team-name" className="text-xs text-gray-500 block mb-1">Nombre del Equipo</label>
+              <select id="red-team-name" className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-red-500/50 outline-none">
                 <option>Seleccionar equipo...</option>
               </select>
             </div>
             <div>
-              <label className="text-xs text-gray-500 block mb-3">Composición (5 jugadores)</label>
+              <div className="text-xs text-gray-500 block mb-3">Composición (5 jugadores)</div>
               <div className="grid grid-cols-5 gap-2">
                 {ROLES.map(role => (
                   <div key={role} className="flex flex-col gap-2">
@@ -116,16 +116,16 @@ export default function Min15Prediction({ onBack }: Props) {
               </h3>
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">⚔️ Asesinatos @ 15</label>
-                  <input type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-cyan-500/50 outline-none mt-1" />
+                  <label htmlFor="blue-kills-15" className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">⚔️ Asesinatos @ 15</label>
+                  <input id="blue-kills-15" type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-cyan-500/50 outline-none mt-1" />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">👥 Asistencias @ 15</label>
-                  <input type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-cyan-500/50 outline-none mt-1" />
+                  <label htmlFor="blue-assists-15" className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">👥 Asistencias @ 15</label>
+                  <input id="blue-assists-15" type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-cyan-500/50 outline-none mt-1" />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">💀 Muertes @ 15</label>
-                  <input type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-cyan-500/50 outline-none mt-1" />
+                  <label htmlFor="blue-deaths-15" className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">💀 Muertes @ 15</label>
+                  <input id="blue-deaths-15" type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-cyan-500/50 outline-none mt-1" />
                 </div>
               </div>
             </div>
@@ -137,16 +137,16 @@ export default function Min15Prediction({ onBack }: Props) {
               </h3>
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">⚔️ Asesinatos @ 15</label>
-                  <input type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-red-500/50 outline-none mt-1" />
+                  <label htmlFor="red-kills-15" className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">⚔️ Asesinatos @ 15</label>
+                  <input id="red-kills-15" type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-red-500/50 outline-none mt-1" />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">👥 Asistencias @ 15</label>
-                  <input type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-red-500/50 outline-none mt-1" />
+                  <label htmlFor="red-assists-15" className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">👥 Asistencias @ 15</label>
+                  <input id="red-assists-15" type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-red-500/50 outline-none mt-1" />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">💀 Muertes @ 15</label>
-                  <input type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-red-500/50 outline-none mt-1" />
+                  <label htmlFor="red-deaths-15" className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">💀 Muertes @ 15</label>
+                  <input id="red-deaths-15" type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-red-500/50 outline-none mt-1" />
                 </div>
               </div>
             </div>
@@ -158,13 +158,13 @@ export default function Min15Prediction({ onBack }: Props) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
               <div className="border border-gray-800 bg-[#0A0D14] rounded-xl p-4">
-                <label className="text-xs text-yellow-500 flex items-center gap-1 mb-3">💰 Diferencia de Oro</label>
-                <input type="number" defaultValue={0} className="w-full bg-[#0F121C] border border-gray-800 rounded-lg p-2 text-sm text-gray-300 outline-none mb-2" />
+                <label htmlFor="diff-gold" className="text-xs text-yellow-500 flex items-center gap-1 mb-3">💰 Diferencia de Oro</label>
+                <input id="diff-gold" type="number" defaultValue={0} className="w-full bg-[#0F121C] border border-gray-800 rounded-lg p-2 text-sm text-gray-300 outline-none mb-2" />
                 <span className="text-[10px] text-gray-600 block leading-tight">Positivo favorece azul, negativo favorece rojo</span>
               </div>
 
               <div className="border border-gray-800 bg-[#0A0D14] rounded-xl p-4 flex flex-col items-center justify-center">
-                <label className="text-xs text-blue-400 flex items-center gap-1 mb-4">⭐ Ventaja de Niveles (Global)</label>
+                <div className="text-xs text-blue-400 flex items-center gap-1 mb-4">⭐ Ventaja de Niveles (Global)</div>
                 <div className="flex items-center justify-between w-full max-w-[150px] bg-[#0F121C] border border-gray-800 rounded-lg px-4 py-1.5 mb-3">
                   <button className="text-gray-500 hover:text-white px-2">-</button>
                   <span className="text-lg font-medium">0</span>
@@ -177,8 +177,8 @@ export default function Min15Prediction({ onBack }: Props) {
               </div>
 
               <div className="border border-gray-800 bg-[#0A0D14] rounded-xl p-4">
-                <label className="text-xs text-green-400 flex items-center gap-1 mb-3">🎯 Diferencia de CS (Farmeo)</label>
-                <input type="number" defaultValue={0} className="w-full bg-[#0F121C] border border-gray-800 rounded-lg p-2 text-sm text-gray-300 outline-none mb-2" />
+                <label htmlFor="diff-cs" className="text-xs text-green-400 flex items-center gap-1 mb-3">🎯 Diferencia de CS (Farmeo)</label>
+                <input id="diff-cs" type="number" defaultValue={0} className="w-full bg-[#0F121C] border border-gray-800 rounded-lg p-2 text-sm text-gray-300 outline-none mb-2" />
                 <span className="text-[10px] text-gray-600 block leading-tight">Positivo favorece azul, negativo favorece rojo</span>
               </div>
 
