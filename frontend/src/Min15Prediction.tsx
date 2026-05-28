@@ -6,6 +6,21 @@ interface Props {
 
 const ROLES = ['Top', 'Jungle', 'Mid', 'ADC', 'Support'];
 
+const TEAMS = [
+  {
+    id: 'blue', name: 'Equipo Azul',
+    badgeBg: 'bg-cyan-400', textTitle: 'text-cyan-400',
+    containerBorder: 'border-cyan-900/50', statsBorder: 'border-cyan-900/40',
+    inputFocus: 'focus:border-cyan-500/50'
+  },
+  {
+    id: 'red', name: 'Equipo Rojo',
+    badgeBg: 'bg-red-400', textTitle: 'text-red-400',
+    containerBorder: 'border-red-900/50', statsBorder: 'border-red-900/40',
+    inputFocus: 'focus:border-red-500/50'
+  }
+];
+
 export default function Min15Prediction({ onBack }: Props) {
   return (
     <div className="min-h-screen bg-[#0A0D14] text-white p-6 font-sans">
@@ -29,63 +44,35 @@ export default function Min15Prediction({ onBack }: Props) {
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          {/* Equipo Azul */}
-          <div className="border border-cyan-900/50 bg-[#0F121C]/50 rounded-xl p-6">
-            <h3 className="text-cyan-400 font-medium flex items-center gap-2 mb-6">
-              <span className="w-2 h-2 rounded-full bg-cyan-400"></span> Equipo Azul
-            </h3>
-            <div className="mb-6">
-              <label htmlFor="blue-team-name" className="text-xs text-gray-500 block mb-1">Nombre del Equipo</label>
-              <select id="blue-team-name" className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-cyan-500/50 outline-none">
-                <option>Seleccionar equipo...</option>
-              </select>
-            </div>
-            <div>
-              <div className="text-xs text-gray-500 block mb-3">Composición (5 jugadores)</div>
-              <div className="grid grid-cols-5 gap-2">
-                {ROLES.map(role => (
-                  <div key={role} className="flex flex-col gap-2">
-                    <span className="text-[10px] text-gray-500 text-center lowercase">{role}</span>
-                    <select className="bg-[#0A0D14] border border-gray-800 rounded p-2 text-xs text-gray-300 text-center w-full appearance-none">
-                      <option>Campeón</option>
-                    </select>
-                    <select className="bg-[#0A0D14] border border-gray-800 rounded p-2 text-xs text-gray-300 text-center w-full appearance-none">
-                      <option>Jugador</option>
-                    </select>
-                  </div>
-                ))}
+          {TEAMS.map(team => (
+            <div key={team.id} className={`border ${team.containerBorder} bg-[#0F121C]/50 rounded-xl p-6`}>
+              <h3 className={`${team.textTitle} font-medium flex items-center gap-2 mb-6`}>
+                <span className={`w-2 h-2 rounded-full ${team.badgeBg}`}></span> {team.name}
+              </h3>
+              <div className="mb-6">
+                <label htmlFor={`${team.id}-team-name`} className="text-xs text-gray-500 block mb-1">Nombre del Equipo</label>
+                <select id={`${team.id}-team-name`} className={`w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 ${team.inputFocus} outline-none`}>
+                  <option>Seleccionar equipo...</option>
+                </select>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 block mb-3">Composición (5 jugadores)</div>
+                <div className="grid grid-cols-5 gap-2">
+                  {ROLES.map(role => (
+                    <div key={role} className="flex flex-col gap-2">
+                      <span className="text-[10px] text-gray-500 text-center lowercase">{role}</span>
+                      <select className="bg-[#0A0D14] border border-gray-800 rounded p-2 text-xs text-gray-300 text-center w-full appearance-none">
+                        <option>Campeón</option>
+                      </select>
+                      <select className="bg-[#0A0D14] border border-gray-800 rounded p-2 text-xs text-gray-300 text-center w-full appearance-none">
+                        <option>Jugador</option>
+                      </select>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-
-          {/* Equipo Rojo */}
-          <div className="border border-red-900/50 bg-[#0F121C]/50 rounded-xl p-6">
-            <h3 className="text-red-400 font-medium flex items-center gap-2 mb-6">
-              <span className="w-2 h-2 rounded-full bg-red-400"></span> Equipo Rojo
-            </h3>
-            <div className="mb-6">
-              <label htmlFor="red-team-name" className="text-xs text-gray-500 block mb-1">Nombre del Equipo</label>
-              <select id="red-team-name" className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-red-500/50 outline-none">
-                <option>Seleccionar equipo...</option>
-              </select>
-            </div>
-            <div>
-              <div className="text-xs text-gray-500 block mb-3">Composición (5 jugadores)</div>
-              <div className="grid grid-cols-5 gap-2">
-                {ROLES.map(role => (
-                  <div key={role} className="flex flex-col gap-2">
-                    <span className="text-[10px] text-gray-500 text-center lowercase">{role}</span>
-                    <select className="bg-[#0A0D14] border border-gray-800 rounded p-2 text-xs text-gray-300 text-center w-full appearance-none">
-                      <option>Campeón</option>
-                    </select>
-                    <select className="bg-[#0A0D14] border border-gray-800 rounded p-2 text-xs text-gray-300 text-center w-full appearance-none">
-                      <option>Jugador</option>
-                    </select>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
 
         {/* Sección 2: Estadísticas del Minuto 15 */}
@@ -109,47 +96,27 @@ export default function Min15Prediction({ onBack }: Props) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Azul Stats */}
-            <div className="border border-cyan-900/40 bg-[#0A0D14]/70 rounded-xl p-5">
-              <h3 className="text-cyan-400 font-medium flex items-center gap-2 mb-4 text-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> Equipo Azul
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="blue-kills-15" className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">⚔️ Asesinatos @ 15</label>
-                  <input id="blue-kills-15" type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-cyan-500/50 outline-none mt-1" />
-                </div>
-                <div>
-                  <label htmlFor="blue-assists-15" className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">👥 Asistencias @ 15</label>
-                  <input id="blue-assists-15" type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-cyan-500/50 outline-none mt-1" />
-                </div>
-                <div>
-                  <label htmlFor="blue-deaths-15" className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">💀 Muertes @ 15</label>
-                  <input id="blue-deaths-15" type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-cyan-500/50 outline-none mt-1" />
-                </div>
-              </div>
-            </div>
-
-            {/* Rojo Stats */}
-            <div className="border border-red-900/40 bg-[#0A0D14]/70 rounded-xl p-5">
-              <h3 className="text-red-400 font-medium flex items-center gap-2 mb-4 text-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span> Equipo Rojo
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="red-kills-15" className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">⚔️ Asesinatos @ 15</label>
-                  <input id="red-kills-15" type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-red-500/50 outline-none mt-1" />
-                </div>
-                <div>
-                  <label htmlFor="red-assists-15" className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">👥 Asistencias @ 15</label>
-                  <input id="red-assists-15" type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-red-500/50 outline-none mt-1" />
-                </div>
-                <div>
-                  <label htmlFor="red-deaths-15" className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">💀 Muertes @ 15</label>
-                  <input id="red-deaths-15" type="number" defaultValue={0} className="w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 focus:border-red-500/50 outline-none mt-1" />
+            {TEAMS.map(team => (
+              <div key={team.id} className={`border ${team.statsBorder} bg-[#0A0D14]/70 rounded-xl p-5`}>
+                <h3 className={`${team.textTitle} font-medium flex items-center gap-2 mb-4 text-sm`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${team.badgeBg}`}></span> {team.name}
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor={`${team.id}-kills-15`} className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">⚔️ Asesinatos @ 15</label>
+                    <input id={`${team.id}-kills-15`} type="number" min={0} step={1} className={`w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 ${team.inputFocus} outline-none mt-1`} />
+                  </div>
+                  <div>
+                    <label htmlFor={`${team.id}-assists-15`} className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">👥 Asistencias @ 15</label>
+                    <input id={`${team.id}-assists-15`} type="number" min={0} step={1} className={`w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 ${team.inputFocus} outline-none mt-1`} />
+                  </div>
+                  <div>
+                    <label htmlFor={`${team.id}-deaths-15`} className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">💀 Muertes @ 15</label>
+                    <input id={`${team.id}-deaths-15`} type="number" min={0} step={1} className={`w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 ${team.inputFocus} outline-none mt-1`} />
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
 
           {/* Diferenciales */}
