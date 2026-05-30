@@ -70,5 +70,10 @@ export const getChampImage = (champName: string | undefined) => {
   if (safeName === 'Wukong') safeName = 'MonkeyKing';
   if (safeName === 'RenataGlasc') safeName = 'Renata';
   if (safeName === 'Nunu&Willump') safeName = 'Nunu';
-  return `https://ddragon.leagueoflegends.com/cdn/14.8.1/img/champion/${safeName}.png`;
+  if (safeName === 'BelVeth') safeName = 'Belveth';
+  if (safeName === 'ChoGath') safeName = 'Chogath';
+  if (safeName === 'KaiSa') safeName = 'Kaisa';
+  if (safeName === 'KhaZix') safeName = 'Khazix';
+  if (safeName === 'LeBlanc') safeName = 'Leblanc';
+  return `https://ddragon.leagueoflegends.com/cdn/16.11.1/img/champion/${safeName}.png`;
 };
