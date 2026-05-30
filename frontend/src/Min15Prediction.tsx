@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { getChampImage, getPlayerImage, getTeamLogo } from './utils/imageMapping';
 
 interface Props {
@@ -29,6 +29,7 @@ export default function Min15Prediction({ onBack }: Props) {
 
   const [firstDragon, setFirstDragon] = useState<"Blue" | "Red" | "None">("None");
   const [levelAdvantage, setLevelAdvantage] = useState(0);
+  const [isPlayoffs, setIsPlayoffs] = useState(false);
 
   const [prediction, setPrediction] = useState<{blue: number, red: number} | null>(null);
   const [loading, setLoading] = useState(false);
@@ -75,7 +76,7 @@ export default function Min15Prediction({ onBack }: Props) {
 
       return {
         teamname: fd.get(`${teamId}_team`) as string,
-        playoffs: 1, // Por simplificar asumo que es playoffs, puedes añadir checkbox luego
+        playoffs: isPlayoffs ? 1 : 0,
         side: teamId === 'blue' ? "Blue" : "Red",
         jugadores: {
           top: getPlayer('top'),
@@ -131,9 +132,9 @@ export default function Min15Prediction({ onBack }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0D14] text-white p-6 font-sans">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0A0D14] text-gray-900 dark:text-white p-6 font-sans">
       {/* Volver */}
-      <button onClick={onBack} className="text-gray-400 hover:text-white flex items-center gap-2 mb-4 text-sm transition-colors">
+      <button onClick={onBack} className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white flex items-center gap-2 mb-4 text-sm transition-colors">
         <span>&larr;</span> Volver al Inicio
       </button>
 
@@ -145,10 +146,22 @@ export default function Min15Prediction({ onBack }: Props) {
         <p className="text-gray-500 text-xs mt-1">Configuración completa con estadísticas en tiempo real</p>
       </div>
 
-      <form onSubmit={handleSubmit} onChange={handleFormChange} className="max-w-5xl mx-auto space-y-6 pb-12">
+      <form onSubmit={handleSubmit} onChange={handleFormChange} className="max-w-screen-2xl mx-auto space-y-6 pb-12">
         {/* Sección 1: Configuración de Partida */}
         <div className="flex flex-col items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-200">Configuración de Partida</h2>
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Configuración de Partida</h2>
+            <button
+              type="button"
+              onClick={() => setIsPlayoffs(!isPlayoffs)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-medium transition-all ${
+                isPlayoffs
+                  ? 'border-yellow-500/50 bg-yellow-900/20 text-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.1)]'
+                  : 'border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-[#0A0D14] text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              <span className={isPlayoffs ? '' : 'grayscale opacity-50'}>🏆</span>
+              {isPlayoffs ? 'Playoffs' : 'Temporada Regular'}
+            </button>
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
@@ -157,7 +170,7 @@ export default function Min15Prediction({ onBack }: Props) {
             const teamLogoUrl = getTeamLogo(teamNameSelected);
 
             return (
-            <div key={team.id} className={`border ${team.containerBorder} bg-[#0F121C]/50 rounded-xl p-6`}>
+            <div key={team.id} className={`border ${team.containerBorder} bg-white/50 dark:bg-[#0F121C]/50 rounded-xl p-6`}>
               <h3 className={`${team.textTitle} font-medium flex items-center gap-2 mb-6`}>
                 <span className={`w-2 h-2 rounded-full ${team.badgeBg}`}></span> {team.name}
               </h3>
@@ -167,7 +180,7 @@ export default function Min15Prediction({ onBack }: Props) {
                   {teamLogoUrl && (
                     <img src={teamLogoUrl} alt={teamNameSelected} className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded object-contain pointer-events-none" />
                   )}
-                  <select id={`${team.id}-team-name`} name={`${team.id}_team`} className={`w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 ${team.inputFocus} outline-none ${teamNameSelected ? 'pl-10 text-left' : 'text-center'}`} required>
+                  <select id={`${team.id}-team-name`} name={`${team.id}_team`} className={`w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg p-2.5 text-sm text-gray-800 dark:text-gray-300 ${team.inputFocus} outline-none ${teamNameSelected ? 'pl-10 text-left' : 'text-center'}`} required>
                     <option value="" className="text-center">Seleccionar equipo...</option>
                     {teamsData.map(t => <option key={t} value={t} className="text-left">{t}</option>)}
                   </select>
@@ -192,7 +205,7 @@ export default function Min15Prediction({ onBack }: Props) {
                           {imgUrl && (
                             <img src={imgUrl} alt={champName} className="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full object-cover shadow-sm pointer-events-none" />
                           )}
-                          <select name={`${team.id}_champ_${role.toLowerCase()}`} className={`bg-[#0A0D14] border border-gray-800 rounded p-2 text-xs text-gray-300 w-full appearance-none h-[34px] ${champName ? 'pl-8 text-left' : 'text-center'}`} required>
+                          <select name={`${team.id}_champ_${role.toLowerCase()}`} className={`bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded p-2 text-xs text-gray-800 dark:text-gray-300 w-full appearance-none h-[34px] ${champName ? 'pl-8 text-left' : 'text-center'}`} required>
                             <option value="">Campeón</option>
                             {champsData.map(c => <option key={c} value={c} className="text-left">{c}</option>)}
                           </select>
@@ -202,7 +215,7 @@ export default function Min15Prediction({ onBack }: Props) {
                           {playerImgUrl && (
                             <img src={playerImgUrl} alt={playerName} className="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-md object-cover shadow-sm pointer-events-none" />
                           )}
-                          <select name={`${team.id}_player_${role.toLowerCase()}`} className={`bg-[#0A0D14] border border-gray-800 rounded p-2 text-xs text-gray-300 w-full appearance-none h-[34px] ${playerName ? 'pl-8 text-left' : 'text-center'}`} required>
+                          <select name={`${team.id}_player_${role.toLowerCase()}`} className={`bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded p-2 text-xs text-gray-800 dark:text-gray-300 w-full appearance-none h-[34px] ${playerName ? 'pl-8 text-left' : 'text-center'}`} required>
                             <option value="">Jugador</option>
                             {playersData.map(p => <option key={p} value={p} className="text-left">{p}</option>)}
                           </select>
@@ -217,19 +230,19 @@ export default function Min15Prediction({ onBack }: Props) {
         </div>
 
         {/* Sección 2: Estadísticas del Minuto 15 */}
-        <div className="border border-gray-800 bg-[#0F121C]/40 rounded-xl p-6 mt-8">
+        <div className="border border-gray-500 dark:border-gray-800 bg-white/40 dark:bg-[#0F121C]/40 rounded-xl p-6 mt-8">
           <div className="flex flex-col items-center mb-8">
-            <h2 className="text-lg font-semibold text-gray-200 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
                <span className="text-purple-400">🎯</span> Estadísticas del Minuto 15:00
             </h2>
 
             <div className="mt-6 flex flex-col items-center">
-              <span className="text-xs text-gray-400 mb-2 flex items-center gap-1">🐉 Primer Dragón</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-1">🐉 Primer Dragón</span>
               <div className="flex gap-4">
-                <button type="button" onClick={() => setFirstDragon('Blue')} className={`flex items-center gap-2 px-5 py-1.5 rounded-full border ${firstDragon === 'Blue' ? 'border-cyan-400 bg-cyan-900/40 text-cyan-400' : 'border-gray-800 bg-[#0A0D14] text-gray-500 hover:text-cyan-400'} text-xs transition-colors`}>
+                <button type="button" onClick={() => setFirstDragon('Blue')} className={`flex items-center gap-2 px-5 py-1.5 rounded-full border ${firstDragon === 'Blue' ? 'border-cyan-400 bg-cyan-900/40 text-cyan-400' : 'border-gray-500 dark:border-gray-800 bg-gray50 dark:bg-[#0A0D14] text-gray-500 hover:text-cyan-400'} text-xs transition-colors`}>
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> Equipo Azul
                 </button>
-                <button type="button" onClick={() => setFirstDragon('Red')} className={`flex items-center gap-2 px-5 py-1.5 rounded-full border ${firstDragon === 'Red' ? 'border-red-400 bg-red-900/40 text-red-400' : 'border-gray-800 bg-[#0A0D14] text-gray-500 hover:text-red-400'} text-xs transition-colors`}>
+                <button type="button" onClick={() => setFirstDragon('Red')} className={`flex items-center gap-2 px-5 py-1.5 rounded-full border ${firstDragon === 'Red' ? 'border-red-400 bg-red-900/40 text-red-400' : 'border-gray-500 dark:border-gray-800 bg-gray-50 dark:bg-[#0A0D14] text-gray-500 hover:text-red-400'} text-xs transition-colors`}>
                   <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span> Equipo Rojo
                 </button>
               </div>
@@ -238,22 +251,22 @@ export default function Min15Prediction({ onBack }: Props) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {TEAMS.map(team => (
-              <div key={team.id} className={`border ${team.statsBorder} bg-[#0A0D14]/70 rounded-xl p-5`}>
+              <div key={team.id} className={`border ${team.statsBorder} bg-gray-50/70 dark:bg-[#0A0D14]/70 rounded-xl p-5`}>
                 <h3 className={`${team.textTitle} font-medium flex items-center gap-2 mb-4 text-sm`}>
                   <span className={`w-1.5 h-1.5 rounded-full ${team.badgeBg}`}></span> {team.name}
                 </h3>
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor={`${team.id}-kills-15`} className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">⚔️ Asesinatos @ 15</label>
-                    <input id={`${team.id}-kills-15`} name={`${team.id}_kills_15`} type="number" min={0} step={1} defaultValue={0} className={`w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 ${team.inputFocus} outline-none mt-1`} />
+                    <label htmlFor={`${team.id}-kills-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">⚔️ Asesinatos @ 15</label>
+                    <input id={`${team.id}-kills-15`} name={`${team.id}_kills_15`} type="number" min={0} step={1} defaultValue={0} className={`w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg p-2.5 text-sm text-gray-800 dark:text-gray-300 ${team.inputFocus} outline-none mt-1`} />
                   </div>
                   <div>
-                    <label htmlFor={`${team.id}-assists-15`} className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">👥 Asistencias @ 15</label>
-                    <input id={`${team.id}-assists-15`} name={`${team.id}_assists_15`} type="number" min={0} step={1} defaultValue={0} className={`w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 ${team.inputFocus} outline-none mt-1`} />
+                    <label htmlFor={`${team.id}-assists-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">👥 Asistencias @ 15</label>
+                    <input id={`${team.id}-assists-15`} name={`${team.id}_assists_15`} type="number" min={0} step={1} defaultValue={0} className={`w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg p-2.5 text-sm text-gray-800 dark:text-gray-300 ${team.inputFocus} outline-none mt-1`} />
                   </div>
                   <div>
-                    <label htmlFor={`${team.id}-deaths-15`} className="text-xs text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-800 pb-1">💀 Muertes @ 15</label>
-                    <input id={`${team.id}-deaths-15`} name={`${team.id}_deaths_15`} type="number" min={0} step={1} defaultValue={0} className={`w-full bg-[#0A0D14] border border-gray-800 rounded-lg p-2.5 text-sm text-gray-300 ${team.inputFocus} outline-none mt-1`} />
+                    <label htmlFor={`${team.id}-deaths-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">💀 Muertes @ 15</label>
+                    <input id={`${team.id}-deaths-15`} name={`${team.id}_deaths_15`} type="number" min={0} step={1} defaultValue={0} className={`w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg p-2.5 text-sm text-gray-800 dark:text-gray-300 ${team.inputFocus} outline-none mt-1`} />
                   </div>
                 </div>
               </div>
@@ -261,22 +274,22 @@ export default function Min15Prediction({ onBack }: Props) {
           </div>
 
           {/* Diferenciales */}
-          <div className="mt-8 pt-6 border-t border-gray-800/80">
-            <h3 className="text-sm text-center text-gray-300 mb-6">Diferenciales @ 15:00</h3>
+          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800/80">
+            <h3 className="text-sm text-center text-gray-800 dark:text-gray-300 mb-6">Diferenciales @ 15:00</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-              <div className="border border-gray-800 bg-[#0A0D14] rounded-xl p-4">
+              <div className="border border-gray-200 dark:border-gray-800 bg-gray-300 dark:bg-[#0A0D14] rounded-xl p-4">
                 <label htmlFor="diff-gold" className="text-xs text-yellow-500 flex items-center gap-1 mb-3">💰 Diferencia de Oro</label>
-                <input id="diff-gold" name="diff_gold" type="number" defaultValue={0} className="w-full bg-[#0F121C] border border-gray-800 rounded-lg p-2 text-sm text-gray-300 outline-none mb-2" />
+                <input id="diff-gold" name="diff_gold" type="number" defaultValue={0} className="w-full bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-gray-800 rounded-lg p-2 text-sm text-gray-800 dark:text-gray-300 outline-none mb-2" />
                 <span className="text-[10px] text-gray-600 block leading-tight">Positivo favorece azul, negativo favorece rojo</span>
               </div>
 
-              <div className="border border-gray-800 bg-[#0A0D14] rounded-xl p-4 flex flex-col items-center justify-center">
+              <div className="border border-gray-200 dark:border-gray-800 bg-gray-300 dark:bg-[#0A0D14] rounded-xl p-4 flex flex-col items-center justify-center">
                 <div className="text-xs text-blue-400 flex items-center gap-1 mb-4">⭐ Ventaja de Niveles (Global)</div>
-                <div className="flex items-center justify-between w-full max-w-[150px] bg-[#0F121C] border border-gray-800 rounded-lg px-4 py-1.5 mb-3">
-                  <button type="button" onClick={() => setLevelAdvantage(p => p - 1)} className="text-gray-500 hover:text-white px-2">-</button>
+                <div className="flex items-center justify-between w-full max-w-[150px] bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 mb-3">
+                  <button type="button" onClick={() => setLevelAdvantage(p => p - 1)} className="text-gray-500 hover:text-gray-900 dark:text-white px-2">-</button>
                   <span className="text-lg font-medium">{levelAdvantage}</span>
-                  <button type="button" onClick={() => setLevelAdvantage(p => p + 1)} className="text-gray-500 hover:text-white px-2">+</button>
+                  <button type="button" onClick={() => setLevelAdvantage(p => p + 1)} className="text-gray-500 hover:text-gray-900 dark:text-white px-2">+</button>
                 </div>
                 <div className="w-full h-[2px] bg-gray-800 rounded-full mb-3 flex relative">
                   <div className="absolute left-1/2 w-[2px] h-2 -top-[3px] bg-gray-600"></div>
@@ -284,9 +297,9 @@ export default function Min15Prediction({ onBack }: Props) {
                 <span className="text-[10px] text-gray-600 block text-center leading-tight">Diferencia total sumando las 5 posiciones<br/><br/>Positivo favorece azul, negativo favorece rojo</span>
               </div>
 
-              <div className="border border-gray-800 bg-[#0A0D14] rounded-xl p-4">
+              <div className="border border-gray-200 dark:border-gray-800 bg-gray-300 dark:bg-[#0A0D14] rounded-xl p-4">
                 <label htmlFor="diff-cs" className="text-xs text-green-400 flex items-center gap-1 mb-3">🎯 Diferencia de CS (Farmeo)</label>
-                <input id="diff-cs" name="diff_cs" type="number" defaultValue={0} className="w-full bg-[#0F121C] border border-gray-800 rounded-lg p-2 text-sm text-gray-300 outline-none mb-2" />
+                <input id="diff-cs" name="diff_cs" type="number" defaultValue={0} className="w-full bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-gray-800 rounded-lg p-2 text-sm text-gray-800 dark:text-gray-300 outline-none mb-2" />
                 <span className="text-[10px] text-gray-600 block leading-tight">Positivo favorece azul, negativo favorece rojo</span>
               </div>
 
@@ -304,11 +317,11 @@ export default function Min15Prediction({ onBack }: Props) {
             <div className="mt-8 p-6 bg-gradient-to-r from-cyan-900/40 flex justify-around to-red-900/40 border border-purple-500/30 rounded-xl text-center">
                 <div>
                    <div className="text-cyan-400 font-bold text-3xl">{(prediction.blue * 100).toFixed(1)}%</div>
-                   <div className="text-gray-400 text-sm mt-1">Victoria Azul</div>
+                   <div className="text-gray-600 dark:text-gray-400 text-sm mt-1">Victoria Azul</div>
                 </div>
                 <div>
                    <div className="text-red-400 font-bold text-3xl">{(prediction.red * 100).toFixed(1)}%</div>
-                   <div className="text-gray-400 text-sm mt-1">Victoria Rojo</div>
+                   <div className="text-gray-600 dark:text-gray-400 text-sm mt-1">Victoria Rojo</div>
                 </div>
             </div>
         )}
