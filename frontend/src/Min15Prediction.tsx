@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef, type FormEvent } from 'react';
-import { getChampImage, getPlayerImage, getTeamLogo } from './utils/imageMapping';
+import { useState, useEffect, type FormEvent } from 'react';
+import { getChampImage, getTeamLogo } from './utils/imageMapping';
+import SearchableSelect from './utils/SearchableSelect';
 
 interface Props {
   onBack: () => void;
@@ -176,49 +177,43 @@ export default function Min15Prediction({ onBack }: Props) {
               </h3>
               <div className="mb-6 relative">
                 <label htmlFor={`${team.id}-team-name`} className="text-xs text-gray-500 block mb-1">Nombre del Equipo</label>
-                <div className="relative">
-                  {teamLogoUrl && (
-                    <img src={teamLogoUrl} alt={teamNameSelected} className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded object-contain pointer-events-none" />
-                  )}
-                  <select id={`${team.id}-team-name`} name={`${team.id}_team`} className={`w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg p-2.5 text-sm text-gray-800 dark:text-gray-300 ${team.inputFocus} outline-none ${teamNameSelected ? 'pl-10 text-left' : 'text-center'}`} required>
-                    <option value="" className="text-center">Seleccionar equipo...</option>
-                    {teamsData.map(t => <option key={t} value={t} className="text-left">{t}</option>)}
-                  </select>
-                </div>
+                <SearchableSelect
+                  name={`${team.id}_team`}
+                  options={teamsData}
+                  placeholder="Seleccionar equipo..."
+                  value={selections[`${team.id}_team`] || ''}
+                  onChange={(val) => setSelections(prev => ({ ...prev, [`${team.id}_team`]: val }))}
+                  getImage={getTeamLogo}
+                />
               </div>
               <div>
                 <div className="text-xs text-gray-500 block mb-3">Composición (5 jugadores)</div>
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
                   {ROLES.map(role => {
-                    const champName = selections[`${team.id}_champ_${role.toLowerCase()}`];
-                    const imgUrl = getChampImage(champName);
-
-                    const playerName = selections[`${team.id}_player_${role.toLowerCase()}`];
-                    const playerImgUrl = getPlayerImage(playerName);
 
                     return (
                       <div key={role} className="flex flex-col gap-2 relative">
                         <span className="text-[10px] text-gray-500 text-center lowercase">{role}</span>
 
-                        {/* Selector con hueco para la imagen a la izquierda */}
                         <div className="relative">
-                          {imgUrl && (
-                            <img src={imgUrl} alt={champName} className="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full object-cover shadow-sm pointer-events-none" />
-                          )}
-                          <select name={`${team.id}_champ_${role.toLowerCase()}`} className={`bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded p-2 text-xs text-gray-800 dark:text-gray-300 w-full appearance-none h-[34px] ${champName ? 'pl-8 text-left' : 'text-center'}`} required>
-                            <option value="">Campeón</option>
-                            {champsData.map(c => <option key={c} value={c} className="text-left">{c}</option>)}
-                          </select>
+                            <SearchableSelect
+                            name={`${team.id}_champ_${role.toLowerCase()}`}
+                            options={champsData}
+                            placeholder="Campeón"
+                            value={selections[`${team.id}_champ_${role.toLowerCase()}`] || ''}
+                            onChange={(val) => setSelections(prev => ({ ...prev, [`${team.id}_champ_${role.toLowerCase()}`]: val }))}
+                            getImage={getChampImage}
+                            />
                         </div>
 
                         <div className="relative mt-1">
-                          {playerImgUrl && (
-                            <img src={playerImgUrl} alt={playerName} className="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-md object-cover shadow-sm pointer-events-none" />
-                          )}
-                          <select name={`${team.id}_player_${role.toLowerCase()}`} className={`bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded p-2 text-xs text-gray-800 dark:text-gray-300 w-full appearance-none h-[34px] ${playerName ? 'pl-8 text-left' : 'text-center'}`} required>
-                            <option value="">Jugador</option>
-                            {playersData.map(p => <option key={p} value={p} className="text-left">{p}</option>)}
-                          </select>
+                            <SearchableSelect
+                            name={`${team.id}_player_${role.toLowerCase()}`}
+                            options={playersData}
+                            placeholder="Jugador"
+                            value={selections[`${team.id}_player_${role.toLowerCase()}`] || ''}
+                            onChange={(val) => setSelections(prev => ({ ...prev, [`${team.id}_player_${role.toLowerCase()}`]: val }))}
+                            />
                         </div>
                       </div>
                     );
