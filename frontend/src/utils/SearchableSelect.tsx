@@ -9,15 +9,19 @@ interface SearchableSelectProps {
   getImage?: (name: string) => string | undefined;
 }
 
+const defaul_image_champs = 'https://st4.depositphotos.com/1000507/23078/v/450/depositphotos_230781112-stock-illustration-unidentified-user-icon-simple-vector.jpg';
+
 export default function SearchableSelect({ name, options, placeholder, value, onChange, getImage }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Filtramos las opciones ignorando mayúsculas/minúsculas
-  const filteredOptions = options.filter(opt =>
-    opt.toLowerCase().startsWith(search.toLowerCase())
-  );
+  // Filtramos las opciones para que coincida si el inicio del nombre o de cualquiera de sus palabras coincide con la búsqueda
+  const searchLower = search.toLowerCase();
+  const filteredOptions = options.filter(opt => {
+    const optLower = opt.toLowerCase();
+    return optLower.startsWith(searchLower) || optLower.split(' ').some(word => word.startsWith(searchLower));
+  });
 
   // Cerramos el menú si el usuario hace clic fuera de él
   useEffect(() => {
@@ -30,7 +34,8 @@ export default function SearchableSelect({ name, options, placeholder, value, on
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const selectedImage = getImage && value ? getImage(value) : undefined;
+  const isOfficialValue = options.includes(value);
+  const selectedImage = (getImage && value && isOfficialValue) ? getImage(value) : undefined;
 
   return (
     <div className={`relative w-full text-sm ${isOpen ? 'z-50' : 'z-10'}`} ref={dropdownRef}>
@@ -44,10 +49,18 @@ export default function SearchableSelect({ name, options, placeholder, value, on
         className="w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded pl-1 pr-2 py-2 text-base text-gray-800 dark:text-gray-300 h-[50px] flex items-center justify-between focus:outline-none focus:border-cyan-500/50 transition-colors"
       >
         <div className="flex items-center gap-1 w-full overflow-hidden">
-          {selectedImage && <img src={selectedImage} alt={value} className="w-10 h-10 rounded-full object-cover" />}
-          <span className={value ? '' : 'text-gray-500'}>{value || placeholder}</span>
+          {getImage && (
+            selectedImage ? (
+              <img src={selectedImage} alt={value} className="w-10 h-10 rounded-full object-cover bg-gray-200 dark:bg-gray-800 flex-shrink-0" />
+            ) : value ? (
+              <img src={defaul_image_champs} alt="Default" className="w-10 h-10 rounded-full object-cover bg-gray-300 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shadow-inner flex-shrink-0" />
+            ) : null
+    )}
+          <span className={`truncate text-left ${value ? '' : 'text-gray-500 ml-1'}`}>
+            {value || placeholder}
+          </span>
         </div>
-        <span className="text-[10px] text-gray-500">▼</span>
+        <span className="text-[10px] text-gray-500 flex-shrink-0 ml-1">▼</span>
       </button>
 
       {/* Menú desplegable flotante */}
@@ -69,7 +82,8 @@ export default function SearchableSelect({ name, options, placeholder, value, on
           <ul className="max-h-48 overflow-y-auto">
             {filteredOptions.length > 0 ? (
               filteredOptions.map(option => {
-                const imgUrl = getImage ? getImage(option) : undefined;
+                const isOfficialOption = options.includes(option);
+                const imgUrl = (getImage && isOfficialOption) ? getImage(option) : undefined;
                 return (
                   <li
                     key={option}
@@ -81,15 +95,35 @@ export default function SearchableSelect({ name, options, placeholder, value, on
                     className={`flex items-center gap-2 px-2 py-3 text-sm cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors ${value === option ? 'bg-cyan-900/20 text-cyan-400' : 'text-gray-700 dark:text-gray-300'}`}                  >
                     {getImage && (
                         imgUrl ? (
-                            <img src={imgUrl} alt={option} className="w-9 h-9 rounded-full object-cover" />
+                            <img src={imgUrl} alt={option} className="w-9 h-9 rounded-full object-cover bg-gray-200 dark:bg-gray-800" />
                         ) : (
-                            <div className="w-9 h-9 rounded-full bg-gray-300 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shadow-inner flex items-center justify-center text-gray-500 text-[10px] flex-shrink-0">?</div>                        )
+                            <img src={defaul_image_champs} alt="Default" className="w-9 h-9 rounded-full object-cover bg-gray-300 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shadow-inner flex-shrink-0" />
+                            )
                     )}
                     <span>{option}</span>
                   </li>
                 );
               })
-            ) : (
+            ) : null}
+
+            {/* Opción para añadir valor personalizado si no hay coincidencia exacta */}
+            {search.trim() !== '' && !options.some(opt => opt.toLowerCase() === search.trim().toLowerCase()) && (
+               <li
+                 onClick={() => {
+                   onChange(search.trim());
+                   setIsOpen(false);
+                   setSearch('');
+                 }}
+                 className="flex items-center gap-2 px-2 py-3 text-sm cursor-pointer hover:bg-cyan-900/20 transition-colors text-cyan-500 border-t border-gray-300 dark:border-gray-700"
+               >
+                 {getImage && (
+                   <div className="w-9 h-9 rounded-full bg-gray-300 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shadow-inner flex items-center justify-center text-cyan-500 text-lg flex-shrink-0">+</div>
+                 )}
+                 <span>Usar personalizado: <strong>"{search.trim()}"</strong></span>
+               </li>
+            )}
+
+            {filteredOptions.length === 0 && search.trim() === '' && (
               <li className="px-3 py-4 text-xs text-center text-gray-500">No hay resultados</li>
             )}
           </ul>

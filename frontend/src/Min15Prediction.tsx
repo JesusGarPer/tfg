@@ -23,6 +23,19 @@ const TEAMS = [
   }
 ];
 
+const DEFAULT_ROSTERS: Record<string, Record<string, string>> = {
+  'Karmine Corp': { top: 'Canna', jungle: 'Yike', mid: 'kyeahoo', adc: 'Caliste', support: 'Busio' },
+  'KOI': { top: 'Myrwwn', jungle: 'Elyoya', mid: 'Jojopyun', adc: 'Supa', support: 'Alvaro' },
+  'G2 Esports': { top: 'BrokenBlade', jungle: 'SkewMond', mid: 'Caps', adc: 'Hans Sama', support: 'Labrov' },
+  'Team Heretics': { top: 'Tracyn', jungle: 'Daglas', mid: 'Serin', adc: 'Hype', support: 'Way' },
+  'Fnatic': { top: 'Empyros', jungle: 'Razork', mid: 'Vladi', adc: 'Upset', support: 'Lospa' },
+  'Natus Vincere': { top: 'Maynter', jungle: 'Rhilech', mid: 'Poby', adc: 'SamD', support: 'Parus' },
+  'Team Vitality': { top: 'Naak Nako', jungle: 'Lyncas', mid: 'Humanoid', adc: 'Carzzy', support: 'Fleshy' },
+  'GiantX': { top: 'Lot', jungle: 'ISMA', mid: 'Jackies', adc: 'Noah', support: 'Jun' },
+  'Shifters': { top: 'Rooster', jungle: 'Boukada', mid: 'nuc', adc: 'Paduck', support: 'Stend' },
+  'SK Gaming': { top: 'Wunder', jungle: 'Skeanz', mid: 'LIDER', adc: 'Jopa', support: 'Mikyx' }
+};
+
 export default function Min15Prediction({ onBack }: Props) {
   const [teamsData, setTeamsData] = useState<string[]>([]);
   const [playersData, setPlayersData] = useState<string[]>([]);
@@ -46,7 +59,13 @@ export default function Min15Prediction({ onBack }: Props) {
   useEffect(() => {
     fetch('http://localhost:8000/api/data/teams')
       .then(res => res.json())
-      .then(data => Array.isArray(data) ? setTeamsData(data) : setTeamsData([]))
+      .then(data => {
+        if (Array.isArray(data)) {
+          setTeamsData(data.map((t: string) => t === 'Team BDS' ? 'Shifters' : t));
+        } else {
+          setTeamsData([]);
+        }
+      })
       .catch(console.error);
 
     fetch('http://localhost:8000/api/data/players')
@@ -56,7 +75,22 @@ export default function Min15Prediction({ onBack }: Props) {
 
     fetch('http://localhost:8000/api/data/champions')
       .then(res => res.json())
-      .then(data => Array.isArray(data) ? setChampsData(data) : setChampsData([]))
+      .then(async (data) => {
+        let finalChamps = Array.isArray(data) ? data : [];
+        try {
+          // Obtenemos todos los campeones oficiales desde Riot DataDragon (v16.11.1)
+          const riotRes = await fetch('https://ddragon.leagueoflegends.com/cdn/16.11.1/data/en_US/champion.json');
+          if (riotRes.ok) {
+            const riotData = await riotRes.json();
+            const riotChamps = Object.values(riotData.data).map((c: any) => c.name);
+            // Fusionamos los de la base de datos con los oficiales y quitamos duplicados
+            finalChamps = Array.from(new Set([...finalChamps, ...riotChamps])).sort();
+          }
+        } catch (err) {
+          console.warn('No se pudieron obtener campeones extras de DataDragon', err);
+        }
+        setChampsData(finalChamps);
+      })
       .catch(console.error);
   }, []);
 
@@ -75,8 +109,13 @@ export default function Min15Prediction({ onBack }: Props) {
         campeon: fd.get(`${teamId}_champ_${roleNameEnHtml}`) as string
       });
 
+      let rawTeamName = fd.get(`${teamId}_team`) as string;
+      if (rawTeamName === 'Shifters') {
+        rawTeamName = 'Team BDS';
+      }
+
       return {
-        teamname: fd.get(`${teamId}_team`) as string,
+        teamname: rawTeamName,
         playoffs: isPlayoffs ? 1 : 0,
         side: teamId === 'blue' ? "Blue" : "Red",
         jugadores: {
@@ -167,9 +206,6 @@ export default function Min15Prediction({ onBack }: Props) {
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {TEAMS.map(team => {
-            const teamNameSelected = selections[`${team.id}_team`];
-            const teamLogoUrl = getTeamLogo(teamNameSelected);
-
             return (
             <div key={team.id} className={`border ${team.containerBorder} bg-white/50 dark:bg-[#0F121C]/50 rounded-xl p-6`}>
               <h3 className={`${team.textTitle} font-medium flex items-center gap-2 mb-6`}>
@@ -182,7 +218,20 @@ export default function Min15Prediction({ onBack }: Props) {
                   options={teamsData}
                   placeholder="Seleccionar equipo..."
                   value={selections[`${team.id}_team`] || ''}
-                  onChange={(val) => setSelections(prev => ({ ...prev, [`${team.id}_team`]: val }))}
+                  onChange={(val) => {
+                    setSelections(prev => {
+                      const updated = { ...prev, [`${team.id}_team`]: val };
+                      const roster = DEFAULT_ROSTERS[val];
+                      if (roster) {
+                        updated[`${team.id}_player_top`] = roster.top;
+                        updated[`${team.id}_player_jungle`] = roster.jungle;
+                        updated[`${team.id}_player_mid`] = roster.mid;
+                        updated[`${team.id}_player_adc`] = roster.adc;
+                        updated[`${team.id}_player_support`] = roster.support;
+                      }
+                      return updated;
+                    });
+                  }}
                   getImage={getTeamLogo}
                 />
               </div>
@@ -234,10 +283,10 @@ export default function Min15Prediction({ onBack }: Props) {
             <div className="mt-6 flex flex-col items-center">
               <span className="text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-1">🐉 Primer Dragón</span>
               <div className="flex gap-4">
-                <button type="button" onClick={() => setFirstDragon('Blue')} className={`flex items-center gap-2 px-5 py-1.5 rounded-full border ${firstDragon === 'Blue' ? 'border-cyan-400 bg-cyan-900/40 text-cyan-400' : 'border-gray-500 dark:border-gray-800 bg-gray50 dark:bg-[#0A0D14] text-gray-500 hover:text-cyan-400'} text-xs transition-colors`}>
+                <button type="button" onClick={() => setFirstDragon(prev => prev === 'Blue' ? 'None' : 'Blue')} className={`flex items-center gap-2 px-5 py-1.5 rounded-full border ${firstDragon === 'Blue' ? 'border-cyan-400 bg-cyan-900/40 text-cyan-400' : 'border-gray-500 dark:border-gray-800 bg-gray50 dark:bg-[#0A0D14] text-gray-500 hover:text-cyan-400'} text-xs transition-colors`}>
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> Equipo Azul
                 </button>
-                <button type="button" onClick={() => setFirstDragon('Red')} className={`flex items-center gap-2 px-5 py-1.5 rounded-full border ${firstDragon === 'Red' ? 'border-red-400 bg-red-900/40 text-red-400' : 'border-gray-500 dark:border-gray-800 bg-gray-50 dark:bg-[#0A0D14] text-gray-500 hover:text-red-400'} text-xs transition-colors`}>
+                <button type="button" onClick={() => setFirstDragon(prev => prev === 'Red' ? 'None' : 'Red')} className={`flex items-center gap-2 px-5 py-1.5 rounded-full border ${firstDragon === 'Red' ? 'border-red-400 bg-red-900/40 text-red-400' : 'border-gray-500 dark:border-gray-800 bg-gray-50 dark:bg-[#0A0D14] text-gray-500 hover:text-red-400'} text-xs transition-colors`}>
                   <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span> Equipo Rojo
                 </button>
               </div>

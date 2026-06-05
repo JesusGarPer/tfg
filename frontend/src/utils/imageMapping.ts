@@ -13,7 +13,7 @@ export const LEC_TEAMS = [
   },
   {
     name: 'Team Heretics',
-    logo: 'https://scontent.fsvq5-1.fna.fbcdn.net/v/t39.30808-1/298968382_5632069983511977_4719552152377926978_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=100&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=uleeTJW5cCsQ7kNvwHCUMzC&_nc_oc=AdpFWdwZLlmAUk6pkLpt9kou1ZJu23orf2P--QQjELAmLLEbodLSAZGKFpnuIZeItYQ&_nc_zt=24&_nc_ht=scontent.fsvq5-1.fna&_nc_gid=TY5UzjaY-ZCZyfn6pySl_Q&_nc_ss=7b289&oh=00_Af4e2o7eryR4QC4I5q4wsCAMEQ8a9c3D1aGvu_187rlwbQ&oe=6A016960'
+    logo: 'https://teamheretics.com/es/img/es-teamheretics-logo-1727708959.jpg'
   },
   {
     name: 'KOI',
@@ -41,25 +41,11 @@ export const LEC_TEAMS = [
   }
 ];
 
-export const LEC_PLAYERS: Record<string, string> = {
-  // Puedes añadir aquí las URLs de las imágenes de los jugadores
-  // Ejemplo: "Elyoya": "https://url-de-la-imagen.jpg",
-};
-
 // Función para obtener el logo del equipo
 export const getTeamLogo = (teamName: string | undefined) => {
   if (!teamName) return '';
   const team = LEC_TEAMS.find(t => t.name === teamName);
   return team ? team.logo : `https://ui-avatars.com/api/?name=${encodeURIComponent(teamName)}&background=0D1117&color=06B6D4&bold=true&format=svg`;
-};
-
-// Función para obtener la imagen del jugador
-export const getPlayerImage = (playerName: string | undefined) => {
-  if (!playerName) return '';
-  if (LEC_PLAYERS[playerName]) {
-    return LEC_PLAYERS[playerName];
-  }
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(playerName)}&background=1F2937&color=fff&rounded=true&format=svg`;
 };
 
 // Función para obtener la URL de imagen de un campeón desde Riot DataDragon
@@ -75,5 +61,6 @@ export const getChampImage = (champName: string | undefined) => {
   if (safeName === 'KaiSa') safeName = 'Kaisa';
   if (safeName === 'KhaZix') safeName = 'Khazix';
   if (safeName === 'LeBlanc') safeName = 'Leblanc';
+  if (safeName === 'VelKoz') safeName = 'Velkoz';
   return `https://ddragon.leagueoflegends.com/cdn/16.11.1/img/champion/${safeName}.png`;
 };
