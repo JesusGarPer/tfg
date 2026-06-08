@@ -35,7 +35,7 @@ function App() {
       {/* Selector de modo oscuro */}
       <button
         onClick={() => setIsDark(!isDark)}
-        className="absolute top-6 right-6 p-2 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors"
+        className="absolute top-6 right-6 p-2 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 cursor-pointer transition-colors"
         title="Cambiar Modo"
       >
         {isDark ? '☀️' : '🌙'}

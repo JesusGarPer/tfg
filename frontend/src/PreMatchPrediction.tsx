@@ -8,7 +8,7 @@ export default function PreMatchPrediction({ onBack }: Props) {
       {/* Volver */}
       <button
         onClick={onBack}
-        className="text-gray-600 dark:text-gray-400 hover:text-white flex items-center gap-2 mb-4 text-sm transition-colors self-start"
+        className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer flex items-center gap-2 mb-4 text-sm transition-colors"
       >
         <span>&larr;</span> Volver al Inicio
       </button>

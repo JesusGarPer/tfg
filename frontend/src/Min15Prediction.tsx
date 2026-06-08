@@ -174,7 +174,7 @@ export default function Min15Prediction({ onBack }: Props) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0A0D14] text-gray-900 dark:text-white p-6 font-sans">
       {/* Volver */}
-      <button onClick={onBack} className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white flex items-center gap-2 mb-4 text-sm transition-colors">
+      <button onClick={onBack} className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer flex items-center gap-2 mb-4 text-sm transition-colors">
         <span>&larr;</span> Volver al Inicio
       </button>
 
@@ -193,9 +193,9 @@ export default function Min15Prediction({ onBack }: Props) {
             <button
               type="button"
               onClick={() => setIsPlayoffs(!isPlayoffs)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-medium transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-medium cursor-pointer transition-all ${
                 isPlayoffs
-                  ? 'border-yellow-500/50 bg-yellow-900/20 text-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.1)]'
+                  ? 'border-yellow-500/50 bg-yellow-900/20 text-yellow-900 shadow-[0_0_10px_rgba(234,179,8,0.1)]'
                   : 'border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-[#0A0D14] text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
               }`}
             >
@@ -285,10 +285,10 @@ export default function Min15Prediction({ onBack }: Props) {
             <div className="mt-6 flex flex-col items-center">
               <span className="text-xs text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-1">🐉 Primer Dragón</span>
               <div className="flex gap-4">
-                <button type="button" onClick={() => setFirstDragon(prev => prev === 'Blue' ? 'None' : 'Blue')} className={`flex items-center gap-2 px-5 py-1.5 rounded-full border ${firstDragon === 'Blue' ? 'border-cyan-400 bg-cyan-900/40 text-cyan-400' : 'border-gray-500 dark:border-gray-800 bg-gray50 dark:bg-[#0A0D14] text-gray-500 hover:text-cyan-400'} text-xs transition-colors`}>
+                <button type="button" onClick={() => setFirstDragon(prev => prev === 'Blue' ? 'None' : 'Blue')} className={`flex items-center gap-2 px-5 py-1.5 rounded-full border ${firstDragon === 'Blue' ? 'border-cyan-400 bg-cyan-900/40 text-cyan-800' : 'border-gray-500 dark:border-gray-800 bg-gray50 dark:bg-[#0A0D14] text-gray-500 hover:text-cyan-400'} cursor-pointer text-xs transition-colors`}>
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> Equipo Azul
                 </button>
-                <button type="button" onClick={() => setFirstDragon(prev => prev === 'Red' ? 'None' : 'Red')} className={`flex items-center gap-2 px-5 py-1.5 rounded-full border ${firstDragon === 'Red' ? 'border-red-400 bg-red-900/40 text-red-400' : 'border-gray-500 dark:border-gray-800 bg-gray-50 dark:bg-[#0A0D14] text-gray-500 hover:text-red-400'} text-xs transition-colors`}>
+                <button type="button" onClick={() => setFirstDragon(prev => prev === 'Red' ? 'None' : 'Red')} className={`flex items-center gap-2 px-5 py-1.5 rounded-full border ${firstDragon === 'Red' ? 'border-red-400 bg-red-900/40 text-red-800' : 'border-gray-500 dark:border-gray-800 bg-gray-50 dark:bg-[#0A0D14] text-gray-500 hover:text-red-400'} cursor-pointer text-xs transition-colors`}>
                   <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span> Equipo Rojo
                 </button>
               </div>
@@ -304,15 +304,96 @@ export default function Min15Prediction({ onBack }: Props) {
                 <div className="space-y-4">
                   <div>
                     <label htmlFor={`${team.id}-kills-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">⚔️ Asesinatos @ 15</label>
-                    <input id={`${team.id}-kills-15`} name={`${team.id}_kills_15`} type="number" min={0} step={1} defaultValue={0} className={`w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg p-2.5 text-sm text-gray-800 dark:text-gray-300 ${team.inputFocus} outline-none mt-1`} />
+                    <div className="flex items-stretch w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg mt-1 overflow-hidden focus-within:border-cyan-500/50 transition-colors">
+                      <button
+                        type="button"
+                        tabIndex={-1}
+                        onClick={(e) => { const input = e.currentTarget.nextElementSibling as HTMLInputElement; const currentValue = parseInt(input.value || "0"); input.value = Math.max(0, currentValue - 1).toString();  }}
+                        className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                      >
+                        −
+                      </button>
+                      <input
+                        id={`${team.id}-kills-15`}
+                        name={`${team.id}_kills_15`}
+                        type="text" inputMode="numeric" pattern="[0-9]*" defaultValue="0"
+                        onInput={(e) => {
+                          const target = e.target as HTMLInputElement;
+                          target.value = target.value.replace(/[^0-9]/g, '');
+                        }}
+                        className="flex-1 w-full bg-transparent p-2.5 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      />
+                      <button
+                        type="button"
+                        tabIndex={-1}
+                        onClick={(e) => { const input = e.currentTarget.previousElementSibling as HTMLInputElement; const currentValue = parseInt(input.value || "0"); input.value = (currentValue + 1).toString(); }}
+                        className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label htmlFor={`${team.id}-assists-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">👥 Asistencias @ 15</label>
-                    <input id={`${team.id}-assists-15`} name={`${team.id}_assists_15`} type="number" min={0} step={1} defaultValue={0} className={`w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg p-2.5 text-sm text-gray-800 dark:text-gray-300 ${team.inputFocus} outline-none mt-1`} />
+                    <div className="flex items-stretch w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg mt-1 overflow-hidden focus-within:border-cyan-500/50 transition-colors">
+                      <button
+                        type="button"
+                        tabIndex={-1}
+                        onClick={(e) => { const input = e.currentTarget.nextElementSibling as HTMLInputElement; const currentValue = parseInt(input.value || "0"); input.value = Math.max(0, currentValue - 1).toString();  }}
+                        className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                      >
+                        −
+                      </button>
+                      <input
+                        id={`${team.id}-assists-15`}
+                        name={`${team.id}_assists_15`}
+                        type="text" inputMode="numeric" pattern="[0-9]*" defaultValue="0"
+                        onInput={(e) => {
+                          const target = e.target as HTMLInputElement;
+                          target.value = target.value.replace(/[^0-9]/g, '');
+                        }}
+                        className="flex-1 w-full bg-transparent p-2.5 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      />
+                      <button
+                        type="button"
+                        tabIndex={-1}
+                        onClick={(e) => { const input = e.currentTarget.previousElementSibling as HTMLInputElement; const currentValue = parseInt(input.value || "0"); input.value = (currentValue + 1).toString(); }}
+                        className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label htmlFor={`${team.id}-deaths-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">💀 Muertes @ 15</label>
-                    <input id={`${team.id}-deaths-15`} name={`${team.id}_deaths_15`} type="number" min={0} step={1} defaultValue={0} className={`w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg p-2.5 text-sm text-gray-800 dark:text-gray-300 ${team.inputFocus} outline-none mt-1`} />
+                    <div className="flex items-stretch w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg mt-1 overflow-hidden focus-within:border-cyan-500/50 transition-colors">
+                      <button
+                        type="button"
+                        tabIndex={-1}
+                        onClick={(e) => { const input = e.currentTarget.nextElementSibling as HTMLInputElement; const currentValue = parseInt(input.value || "0"); input.value = Math.max(0, currentValue - 1).toString(); }}
+                        className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                      >
+                        −
+                      </button>
+                      <input
+                        id={`${team.id}-deaths-15`}
+                        name={`${team.id}_deaths_15`}
+                        type="text" inputMode="numeric" pattern="[0-9]*" defaultValue="0"
+                        onInput={(e) => {
+                          const target = e.target as HTMLInputElement;
+                          target.value = target.value.replace(/[^0-9]/g, '');
+                        }}
+                        className="flex-1 w-full bg-transparent p-2.5 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      />
+                      <button
+                        type="button"
+                        tabIndex={-1}
+                        onClick={(e) => { const input = e.currentTarget.previousElementSibling as HTMLInputElement; const currentValue = parseInt(input.value || "0"); input.value = (currentValue + 1).toString(); }}
+                        className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -324,29 +405,43 @@ export default function Min15Prediction({ onBack }: Props) {
             <h3 className="text-sm text-center text-gray-800 dark:text-gray-300 mb-6">Diferenciales @ 15:00</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-              <div className="border border-gray-200 dark:border-gray-800 bg-gray-300 dark:bg-[#0A0D14] rounded-xl p-4">
-                <label htmlFor="diff-gold" className="text-xs text-yellow-500 flex items-center gap-1 mb-3">💰 Diferencia de Oro</label>
-                <input id="diff-gold" name="diff_gold" type="number" defaultValue={0} className="w-full bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-gray-800 rounded-lg p-2 text-sm text-gray-800 dark:text-gray-300 outline-none mb-2" />
-                <span className="text-[10px] text-gray-600 block leading-tight">Positivo favorece azul, negativo favorece rojo</span>
+              <div className="border border-gray-200 dark:border-gray-800 bg-gray-300 dark:bg-[#0A0D14] rounded-xl p-4 flex flex-col items-center justify-center gap-4">
+                <label htmlFor="diff-gold" className="text-md text-yellow-700 dark:text-yellow-600 flex items-center gap-1 mb-3">💰 Diferencia de Oro</label>
+                <div className="flex items-stretch w-full max-w-[200px] bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden focus-within:border-cyan-500/50 transition-colors mb-2">
+                  <button type="button" tabIndex={-1} onClick={(e) => { const input = e.currentTarget.nextElementSibling as HTMLInputElement;input.value = (parseInt(input.value || "0") - 1).toString();}}
+                  className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">−</button>
+                  <input id="diff-gold" name="diff_gold" type="text" inputMode="numeric" pattern="-?[0-9]*" defaultValue="0" onInput={(e) => {const target = e.target as HTMLInputElement;target.value = target.value.replace(/[^0-9-]/g, '');}}
+                  className="flex-1 w-full bg-transparent p-2 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                  <button type="button" tabIndex={-1} onClick={(e) => {const input = e.currentTarget.previousElementSibling as HTMLInputElement;input.value = (parseInt(input.value || "0") + 1).toString();}}
+                  className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">+</button>
+                </div>
+                <span className="text-[12px] text-gray-600 dark:text-gray-500 block leading-tight">Positivo favorece azul, negativo favorece rojo</span>
               </div>
 
-              <div className="border border-gray-200 dark:border-gray-800 bg-gray-300 dark:bg-[#0A0D14] rounded-xl p-4 flex flex-col items-center justify-center">
-                <div className="text-xs text-blue-400 flex items-center gap-1 mb-4">⭐ Ventaja de Niveles (Global)</div>
-                <div className="flex items-center justify-between w-full max-w-[150px] bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-gray-800 rounded-lg px-4 py-1.5 mb-3">
-                  <button type="button" onClick={() => setLevelAdvantage(p => p - 1)} className="text-gray-500 hover:text-gray-900 dark:text-white px-2">-</button>
-                  <span className="text-lg font-medium">{levelAdvantage}</span>
-                  <button type="button" onClick={() => setLevelAdvantage(p => p + 1)} className="text-gray-500 hover:text-gray-900 dark:text-white px-2">+</button>
+              <div className="border border-gray-200 dark:border-gray-800 bg-gray-300 dark:bg-[#0A0D14] rounded-xl p-4 flex flex-col items-center justify-between">
+                <label htmlFor="diff-level" className="text-md text-blue-800 dark:text-blue-500 flex items-center gap-1 mb-3">⭐ Ventaja de Niveles (Global)</label>
+                <div className="flex items-stretch w-full max-w-[200px] bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden focus-within:border-cyan-500/50 transition-colors mb-2">
+                  <button type="button" tabIndex={-1} onClick={(e) => { const input = e.currentTarget.nextElementSibling as HTMLInputElement;input.value = (parseInt(input.value || "0") - 1).toString();}}
+                  className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">−</button>
+                  <input id="diff-level" name="diff_level" type="text" inputMode="numeric" pattern="-?[0-9]*" defaultValue="0" onInput={(e) => {const target = e.target as HTMLInputElement;target.value = target.value.replace(/[^0-9-]/g, '');}}
+                  className="flex-1 w-full bg-transparent p-2 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                  <button type="button" tabIndex={-1} onClick={(e) => {const input = e.currentTarget.previousElementSibling as HTMLInputElement;input.value = (parseInt(input.value || "0") + 1).toString();}}
+                  className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">+</button>
                 </div>
-                <div className="w-full h-[2px] bg-gray-800 rounded-full mb-3 flex relative">
-                  <div className="absolute left-1/2 w-[2px] h-2 -top-[3px] bg-gray-600"></div>
-                </div>
-                <span className="text-[10px] text-gray-600 block text-center leading-tight">Diferencia total sumando las 5 posiciones<br/><br/>Positivo favorece azul, negativo favorece rojo</span>
+                <span className="text-[12px] text-gray-600 dark:text-gray-500 block text-center leading-tight">Diferencia total sumando las 5 posiciones<br/>Positivo favorece azul, negativo favorece rojo</span>
               </div>
 
-              <div className="border border-gray-200 dark:border-gray-800 bg-gray-300 dark:bg-[#0A0D14] rounded-xl p-4">
-                <label htmlFor="diff-cs" className="text-xs text-green-400 flex items-center gap-1 mb-3">🎯 Diferencia de CS (Farmeo)</label>
-                <input id="diff-cs" name="diff_cs" type="number" defaultValue={0} className="w-full bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-gray-800 rounded-lg p-2 text-sm text-gray-800 dark:text-gray-300 outline-none mb-2" />
-                <span className="text-[10px] text-gray-600 block leading-tight">Positivo favorece azul, negativo favorece rojo</span>
+              <div className="border border-gray-200 dark:border-gray-800 bg-gray-300 dark:bg-[#0A0D14] rounded-xl p-4 flex flex-col items-center justify-center gap-4">
+                <label htmlFor="diff-cs" className="text-md text-green-800 dark:text-green-600 flex items-center gap-1 mb-3">🎯 Diferencia de CS (Farmeo)</label>
+                <div className="flex items-stretch w-full max-w-[200px] bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden focus-within:border-cyan-500/50 transition-colors mb-2">
+                  <button type="button" tabIndex={-1} onClick={(e) => { const input = e.currentTarget.nextElementSibling as HTMLInputElement;input.value = (parseInt(input.value || "0") - 1).toString();}}
+                  className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">−</button>
+                  <input id="diff-cs" name="diff_cs" type="text" inputMode="numeric" pattern="-?[0-9]*" defaultValue="0" onInput={(e) => {const target = e.target as HTMLInputElement;target.value = target.value.replace(/[^0-9-]/g, '');}}
+                  className="flex-1 w-full bg-transparent p-2 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                  <button type="button" tabIndex={-1} onClick={(e) => {const input = e.currentTarget.previousElementSibling as HTMLInputElement;input.value = (parseInt(input.value || "0") + 1).toString();}}
+                  className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">+</button>
+                </div>
+                <span className="text-[12px] text-gray-600 dark:text-gray-500 block leading-tight">Positivo favorece azul, negativo favorece rojo</span>
               </div>
 
             </div>
@@ -362,11 +457,11 @@ export default function Min15Prediction({ onBack }: Props) {
         {prediction && (
             <div className="mt-8 p-6 bg-gradient-to-r from-cyan-900/40 flex justify-around to-red-900/40 border border-purple-500/30 rounded-xl text-center">
                 <div>
-                   <div className="text-cyan-400 font-bold text-3xl">{(prediction.blue * 100).toFixed(1)}%</div>
+                   <div className="text-cyan-700 font-bold text-3xl">{(prediction.blue * 100).toFixed(1)}%</div>
                    <div className="text-gray-600 dark:text-gray-400 text-sm mt-1">Victoria Azul</div>
                 </div>
                 <div>
-                   <div className="text-red-400 font-bold text-3xl">{(prediction.red * 100).toFixed(1)}%</div>
+                   <div className="text-red-500 font-bold text-3xl">{(prediction.red * 100).toFixed(1)}%</div>
                    <div className="text-gray-600 dark:text-gray-400 text-sm mt-1">Victoria Rojo</div>
                 </div>
             </div>
@@ -374,7 +469,7 @@ export default function Min15Prediction({ onBack }: Props) {
 
         {/* Action Button */}
         <div className="flex justify-center mt-10">
-          <button type="submit" disabled={loading} className={`bg-gradient-to-r from-cyan-800 to-blue-900 hover:from-cyan-700 hover:to-blue-800 border border-cyan-500/30 text-cyan-50 text-sm font-medium py-3 px-8 rounded-lg shadow-[0_0_15px_rgba(8,145,178,0.2)] transition-all transform hover:scale-[1.02] ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+          <button type="submit" disabled={loading} className={`cursor-pointer bg-gradient-to-r from-cyan-800 to-blue-900 hover:from-cyan-700 hover:to-blue-800 border border-cyan-500/30 text-cyan-50 text-sm font-medium py-3 px-8 rounded-lg shadow-[0_0_15px_rgba(8,145,178,0.2)] transition-all transform hover:scale-[1.02] ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
             {loading ? 'Calculando...' : 'Ejecutar Modelo Predictivo'}
           </button>
         </div>

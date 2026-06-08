@@ -45,7 +45,7 @@ export default function SearchableSelect({ name, options, placeholder, value, on
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded pl-1 pr-2 py-2 text-base text-gray-800 dark:text-gray-300 h-[50px] flex items-center justify-between focus:outline-none focus:border-cyan-500/50 transition-colors"
+        className="w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded cursor-pointer pl-1 pr-2 py-2 text-base text-gray-800 dark:text-gray-300 h-[50px] flex items-center justify-between focus:outline-none focus:border-cyan-500/50 transition-colors"
       >
         <div className="flex items-center gap-1 w-full overflow-hidden">
           {getImage && (
