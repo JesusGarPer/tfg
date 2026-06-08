@@ -10,9 +10,6 @@ interface SearchableSelectProps {
   defaultImage?: string;
 }
 
-const defaul_image_champs = '/defaultChamp.jpg';
-const defaul_image_teams = '/defaultTeam.png';
-
 export default function SearchableSelect({ name, options, placeholder, value, onChange, getImage, defaultImage }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -114,7 +111,7 @@ export default function SearchableSelect({ name, options, placeholder, value, on
                             )
                         )
                     )}
-                    <span>{option}</span>
+                    <span className="flex-1 min-w-0 break-words leading-tight">{option}</span>
                   </li>
                 );
               })
@@ -133,7 +130,7 @@ export default function SearchableSelect({ name, options, placeholder, value, on
                  {getImage && (
                    <div className="w-9 h-9 rounded-full bg-gray-300 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shadow-inner flex items-center justify-center text-cyan-500 text-lg flex-shrink-0">+</div>
                  )}
-                 <span>Usar personalizado: <strong>"{search.trim()}"</strong></span>
+                 <span className="flex-1 min-w-0 break-words leading-tight">Usar personalizado: <strong>"{search.trim()}"</strong></span>
                </li>
             )}
 
