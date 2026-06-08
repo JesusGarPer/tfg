@@ -233,6 +233,7 @@ export default function Min15Prediction({ onBack }: Props) {
                     });
                   }}
                   getImage={getTeamLogo}
+                  defaultImage="/defaultTeam.png"
                 />
               </div>
               <div>
@@ -252,6 +253,7 @@ export default function Min15Prediction({ onBack }: Props) {
                             value={selections[`${team.id}_champ_${role.toLowerCase()}`] || ''}
                             onChange={(val) => setSelections(prev => ({ ...prev, [`${team.id}_champ_${role.toLowerCase()}`]: val }))}
                             getImage={getChampImage}
+                            defaultImage="/defaultChamp.jpg"
                             />
                         </div>
 

@@ -7,11 +7,13 @@ interface SearchableSelectProps {
   value: string;
   onChange: (val: string) => void;
   getImage?: (name: string) => string | undefined;
+  defaultImage?: string;
 }
 
-const defaul_image_champs = 'https://st4.depositphotos.com/1000507/23078/v/450/depositphotos_230781112-stock-illustration-unidentified-user-icon-simple-vector.jpg';
+const defaul_image_champs = '/defaultChamp.jpg';
+const defaul_image_teams = '/defaultTeam.png';
 
-export default function SearchableSelect({ name, options, placeholder, value, onChange, getImage }: SearchableSelectProps) {
+export default function SearchableSelect({ name, options, placeholder, value, onChange, getImage, defaultImage }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -53,9 +55,15 @@ export default function SearchableSelect({ name, options, placeholder, value, on
             selectedImage ? (
               <img src={selectedImage} alt={value} className="w-10 h-10 rounded-full object-cover bg-gray-200 dark:bg-gray-800 flex-shrink-0" />
             ) : value ? (
-              <img src={defaul_image_champs} alt="Default" className="w-10 h-10 rounded-full object-cover bg-gray-300 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shadow-inner flex-shrink-0" />
+              defaultImage ? (
+                <img src={defaultImage} alt="Default" className="w-10 h-10 rounded-full object-cover bg-gray-300 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shadow-inner flex-shrink-0" />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shadow-inner flex items-center justify-center text-gray-500 text-xs font-bold uppercase flex-shrink-0">
+                {value.charAt(0)}
+                </div>
+              )
             ) : null
-    )}
+          )}
           <span className={`truncate text-left ${value ? '' : 'text-gray-500 ml-1'}`}>
             {value || placeholder}
           </span>
@@ -97,8 +105,14 @@ export default function SearchableSelect({ name, options, placeholder, value, on
                         imgUrl ? (
                             <img src={imgUrl} alt={option} className="w-9 h-9 rounded-full object-cover bg-gray-200 dark:bg-gray-800" />
                         ) : (
-                            <img src={defaul_image_champs} alt="Default" className="w-9 h-9 rounded-full object-cover bg-gray-300 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shadow-inner flex-shrink-0" />
+                            defaultImage ? (
+                              <img src={defaultImage} alt="Default" className="w-9 h-9 rounded-full object-cover bg-gray-300 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shadow-inner flex-shrink-0" />
+                            ) : (
+                              <div className="w-9 h-9 rounded-full bg-gray-300 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shadow-inner flex items-center justify-center text-gray-500 text-[10px] font-bold uppercase flex-shrink-0">
+                                {option.charAt(0)}
+                              </div>
                             )
+                        )
                     )}
                     <span>{option}</span>
                   </li>
