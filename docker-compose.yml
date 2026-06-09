@@ -31,6 +31,9 @@ services:
       - .env
     environment:
       POSTGRES_HOST: postgres_db
+    volumes:
+      - ./db:/backend/db
+      - ./data:/backend/data
 
   # 3. FRONTEND
   frontend:
