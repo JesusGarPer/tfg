@@ -12,8 +12,5 @@ data/raw/*.csv
 __pycache__/
 *.py[cod]
 
-# Modelos guardados
-models/
-
 # Docker overrides (local settings)
 docker-compose.override.yml
