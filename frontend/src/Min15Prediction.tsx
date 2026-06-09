@@ -100,16 +100,32 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
   // --- LÓGICA PARA MANTENER PULSADO (LONG PRESS) ---
   const timerRef = useRef<number | null>(null);
 
+  useEffect(() => {
+    return () => {
+      if (timerRef.current !== null) {
+        window.clearInterval(timerRef.current);
+      }
+    };
+  }, []);
+
   const handlePressStart = (id: string, step: number, min: number, max: number, isDecimal: boolean = false) => {
+    if (timerRef.current !== null) {
+      window.clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
     const updateValue = () => {
       const input = document.getElementById(id) as HTMLInputElement;
       if (!input) return;
 
       if (isDecimal) {
-        const val = parseFloat(input.value || "0");
+        const parsed = parseFloat(input.value || "0");
+        const val = Number.isNaN(parsed) ? 0 : parsed;
         input.value = Math.min(max, Math.max(min, val + step)).toFixed(1);
+
       } else {
-        const val = parseInt(input.value || "0", 10);
+        const parsed = parseInt(input.value || "0", 10);
+        const val = Number.isNaN(parsed) ? 0 : parsed;
         input.value = Math.min(max, Math.max(min, val + step)).toString();
       }
     };
@@ -120,7 +136,7 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
   };
 
   const handlePressEnd = () => {
-    if (timerRef.current) {
+    if (timerRef.current !== null) {
       window.clearInterval(timerRef.current);
       timerRef.current = null;
     }
