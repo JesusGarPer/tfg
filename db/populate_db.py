@@ -129,19 +129,22 @@ def ejecutar_pipeline():
     now = datetime.now()
     print("📤 Subiendo tablas optimizadas a PostgreSQL...")
 
+    # Creamos la cadena de conexión directa para Pandas
+    db_uri = f"postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
     # Equipos
     df_teams = pd.DataFrame(
         list(backend_stats["teams"].items()), columns=["teamname", "win_ratio"]
     )
     df_teams["updated_at"] = now
-    df_teams.to_sql("team_stats", engine, if_exists="replace", index=False)
+    df_teams.to_sql("team_stats", db_uri, if_exists="replace", index=False)
 
     # Jugadores
     df_players = pd.DataFrame(
         list(backend_stats["players"].items()), columns=["playername", "win_ratio"]
     )
     df_players["updated_at"] = now
-    df_players.to_sql("player_stats", engine, if_exists="replace", index=False)
+    df_players.to_sql("player_stats", db_uri, if_exists="replace", index=False)
 
     # Campeones
     todos_los_champs = set(
@@ -159,7 +162,7 @@ def ejecutar_pipeline():
             }
         )
     df_champs = pd.DataFrame(lista_champs)
-    df_champs.to_sql("champion_stats", engine, if_exists="replace", index=False)
+    df_champs.to_sql("champion_stats", db_uri, if_exists="replace", index=False)
 
     print("🚀 ¡Todo listo! Base de datos inicializada y poblada correctamente.")
 

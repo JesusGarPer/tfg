@@ -57,8 +57,10 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
     setSelections(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
   useEffect(() => {
-    fetch('http://localhost:8000/api/data/teams')
+    fetch(`${API_BASE_URL}/api/data/teams`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -69,12 +71,12 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
       })
       .catch(console.error);
 
-    fetch('http://localhost:8000/api/data/players')
+    fetch(`${API_BASE_URL}/api/data/players`)
       .then(res => res.json())
       .then(data => Array.isArray(data) ? setPlayersData(data) : setPlayersData([]))
       .catch(console.error);
 
-    fetch('http://localhost:8000/api/data/champions')
+    fetch(`${API_BASE_URL}/api/data/champions`)
       .then(res => res.json())
       .then(async (data) => {
         let finalChamps = Array.isArray(data) ? data : [];
