@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* Configurar Tailwind v4 para que el modo oscuro (dark) funcione por la clase '.dark' en lugar del tema del sistema operativo */
+@variant dark (&:where(.dark, .dark *));
+
+/* Ocultar barra de desplazamiento globalmente pero mantener la funcionalidad de scroll */
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none;  /* IE y Edge */
+  scrollbar-width: none;  /* Firefox */
+}

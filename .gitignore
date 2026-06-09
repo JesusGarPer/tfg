@@ -14,3 +14,6 @@ __pycache__/
 
 # Modelos guardados
 models/
+
+# Docker overrides (local settings)
+docker-compose.override.yml
