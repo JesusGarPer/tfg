@@ -22,11 +22,11 @@ function App() {
   }, [isDark]);
 
   if (view === 'min15') {
-    return <Min15Prediction onBack={() => setView('home')} />;
+    return <Min15Prediction onBack={() => setView('home')} isDark={isDark} toggleTheme={() => setIsDark(!isDark)} />;
   }
 
   if (view === 'prematch') {
-    return <PreMatchPrediction onBack={() => setView('home')} />;
+    return <PreMatchPrediction onBack={() => setView('home')} isDark={isDark} toggleTheme={() => setIsDark(!isDark)} />;
   }
 
   return (

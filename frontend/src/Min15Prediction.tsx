@@ -4,6 +4,8 @@ import SearchableSelect from './utils/SearchableSelect';
 
 interface Props {
   onBack: () => void;
+  isDark: boolean;
+  toggleTheme: () => void;
 }
 
 const ROLES = ['Top', 'Jungle', 'Mid', 'ADC', 'Support'];
@@ -36,13 +38,12 @@ const DEFAULT_ROSTERS: Record<string, Record<string, string>> = {
   'SK Gaming': { top: 'Wunder', jungle: 'Skeanz', mid: 'LIDER', adc: 'Jopa', support: 'Mikyx' }
 };
 
-export default function Min15Prediction({ onBack }: Props) {
+export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) {
   const [teamsData, setTeamsData] = useState<string[]>([]);
   const [playersData, setPlayersData] = useState<string[]>([]);
   const [champsData, setChampsData] = useState<string[]>([]);
 
   const [firstDragon, setFirstDragon] = useState<"Blue" | "Red" | "None">("None");
-  const [levelAdvantage, setLevelAdvantage] = useState(0);
   const [isPlayoffs, setIsPlayoffs] = useState(false);
 
   const [prediction, setPrediction] = useState<{blue: number, red: number} | null>(null);
@@ -138,7 +139,7 @@ export default function Min15Prediction({ onBack }: Props) {
         deaths_azul: Number(fd.get(`blue_deaths_15`)) || 0,
         deaths_rojo: Number(fd.get(`red_deaths_15`)) || 0,
         gold_diff: Number(fd.get(`diff_gold`)) || 0,
-        xp_diff: levelAdvantage * 1180, // aproximación de "Ventaja de Niveles" -> xp
+        xp_diff: Number(fd.get(`diff_level`)) * 1180 || 0, // aproximación de "Ventaja de Niveles" -> xp
         cs_diff: Number(fd.get(`diff_cs`)) || 0,
       },
       equipo_azul: getTeamData('blue'),
@@ -185,6 +186,15 @@ export default function Min15Prediction({ onBack }: Props) {
         </h1>
         <p className="text-gray-500 text-xs mt-1">Configuración completa con estadísticas en tiempo real</p>
       </div>
+
+      {/* Selector de modo oscuro */}
+      <button
+        onClick={toggleTheme}
+        className="absolute top-6 right-6 p-2 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+        title="Cambiar Modo"
+      >
+        {isDark ? '☀️' : '🌙'}
+      </button>
 
       <form onSubmit={handleSubmit} onChange={handleFormChange} className="max-w-screen-2xl mx-auto space-y-6 pb-12">
         {/* Sección 1: Configuración de Partida */}
