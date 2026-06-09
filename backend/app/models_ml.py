@@ -1,6 +1,7 @@
 import joblib
 import os
 import logging
+import pandas as pd
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -98,10 +99,13 @@ def ejecutar_inferencia(datos_entrada_dict):
     ]
 
     # Usamos .get(col, 0) para proveer un valor nulo por si alguna vez falta un dato no rompa el backend
-    vector = [[datos_procesados.get(col, 0) for col in orden_variables]]
+    valores = [[datos_procesados.get(col, 0) for col in orden_variables]]
+
+    # Envolvemos los datos en un DataFrame con los nombres exactos para que scikit-learn no envie warnings
+    df_vector = pd.DataFrame(valores, columns=orden_variables)
 
     # Escalamos los datos
-    vector_escalado = scaler.transform(vector)
+    vector_escalado = scaler.transform(df_vector)
 
     # Obtenemos la probabilidad de victoria
     prediccion = modelo_predictivo.predict_proba(vector_escalado)
