@@ -18,8 +18,8 @@ Para ejecutar este proyecto, solo necesitas tener instalados los siguientes prog
 ### 2. Clonar el repositorio
 Abre una terminal y descarga el código fuente:
 ```bash
-git clone <https://github.com/JesusGarPer/tfg.git>
-cd <tfg>
+git clone https://github.com/JesusGarPer/tfg.git
+cd tfg
 ```
 
 ### 3. Configurar variables de entorno
