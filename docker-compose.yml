@@ -32,11 +32,14 @@ services:
     environment:
       POSTGRES_HOST: postgres_db
 
-  # 3. FRONTEND (Preparado para más adelante)
-  # frontend:
-  #   build: ./frontend
-  #   ports:
-  #     - "8501:8501"
+  # 3. FRONTEND
+  frontend:
+    build: ./frontend
+    container_name: lol_predict_frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
