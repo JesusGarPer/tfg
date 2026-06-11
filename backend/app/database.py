@@ -19,7 +19,13 @@ SQLALCHEMY_DATABASE_URL = URL.create(
 )
 
 try:
-    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL,
+        pool_size=50,
+        max_overflow=100,
+        pool_timeout=60,
+        pool_pre_ping=True,
+    )
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 except Exception as e:
     print(f"Error al conectar con la base de datos: {e}")
