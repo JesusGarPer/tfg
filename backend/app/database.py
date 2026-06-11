@@ -21,9 +21,9 @@ SQLALCHEMY_DATABASE_URL = URL.create(
 try:
     engine = create_engine(
         SQLALCHEMY_DATABASE_URL,
-        pool_size=50,
-        max_overflow=100,
-        pool_timeout=60,
+        pool_size=int(os.getenv("DB_POOL_SIZE", "10")),
+        max_overflow=int(os.getenv("DB_MAX_OVERFLOW", "20")),
+        pool_timeout=int(os.getenv("DB_POOL_TIMEOUT", "30")),
         pool_pre_ping=True,
     )
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

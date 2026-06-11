@@ -1,11 +1,11 @@
 // @vitest-environment jsdom
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from 'vitest';
 import Min15Prediction from '../Min15Prediction';
 
 // Simulamos los componentes hijos para aislar la prueba de Min15Prediction
 // Esto evita problemas si SearchableSelect hace cosas complejas con el DOM
-vi.mock('./utils/SearchableSelect', () => ({
+vi.mock('../utils/SearchableSelect', () => ({
   default: ({ placeholder }: { placeholder: string }) => (
     <div data-testid="mock-select">{placeholder}</div>
   )
@@ -29,8 +29,12 @@ describe('Componente Min15Prediction', () => {
 
   afterEach(() => {
     cleanup();
+    vi.useRealTimers();
   });
 
+  afterAll(() => {
+    vi.unstubAllGlobals(); // Se libera el fetch solo cuando terminan los 6 tests
+  });
 
   it('renderiza el título y los elementos principales correctamente', async () => {
     render(<Min15Prediction onBack={() => {}} isDark={true} toggleTheme={() => {}} />);
@@ -73,6 +77,40 @@ describe('Componente Min15Prediction', () => {
     // Al hacer clic, debe cambiar a Playoffs
     fireEvent.click(toggleButton);
     expect(screen.getByText(/Playoffs/i)).toBeDefined();
+  });
+
+  it('incrementa el valor de un input al mantener pulsado el botón "+"', () => {
+    // Activamos los temporizadores falsos
+    vi.useFakeTimers();
+
+    render(<Min15Prediction onBack={() => {}} isDark={true} toggleTheme={() => {}} />);
+
+    // Cogemos el primer botón "+" que encontremos
+    const botonesPlus = screen.getAllByText(/\+/);
+    const primerBotonPlus = botonesPlus[0];
+
+    // Buscamos el input numérico correspondiente.
+    const inputsNumericos = screen.getAllByRole('textbox');
+    const inputAsociado = inputsNumericos[0];
+
+    // Guardamos el valor inicial para comparar
+    const valorInicial = Number(inputAsociado.getAttribute('value')) || 0;
+
+    // Simulamos mantener pulsado el botón
+    fireEvent.mouseDown(primerBotonPlus);
+
+    // Avanzamos el tiempo 500 milisegundos de forma instantánea
+    vi.advanceTimersByTime(500);
+
+    // Soltamos el botón
+    fireEvent.mouseUp(primerBotonPlus);
+
+    // Comprobamos el resultado.
+    const valorFinal = Number((inputAsociado as HTMLInputElement).value);
+    expect(valorFinal).toBeGreaterThan(valorInicial);
+
+    // Restauramos el reloj normal para que los demás tests no fallen
+    vi.useRealTimers();
   });
 
   it('envía el formulario y muestra la predicción exitosa', async () => {

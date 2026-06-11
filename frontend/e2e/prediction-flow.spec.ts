@@ -143,23 +143,13 @@ test.describe('Flujo de la aplicación de predicción minuto 15', () => {
 
     // Verifica que puede editar valores de XP
     const inputNiveles = page.locator('#diff-level');
-    const botonLevelPlus = page.locator('div:has(> #diff-level)').locator('button:has-text("+")');
-    await botonLevelPlus.hover();
-    await page.mouse.down();
-    await page.waitForTimeout(500);
-    await page.mouse.up();
-    const valorLevel = parseInt(await inputNiveles.inputValue() || "0", 10);
-    await expect(valorLevel).toBeGreaterThan(0);
+    await inputNiveles.fill('5');
+    await expect(inputNiveles).toHaveValue('5');
 
     // Verifica que puede editar valores de CS
     const inputCS = page.locator('#diff-cs');
-    const botonCSMinus = page.locator('div:has(> #diff-cs)').locator('button:has-text("−")');
-    await botonCSMinus.hover();
-    await page.mouse.down();
-    await page.waitForTimeout(500);
-    await page.mouse.up();
-    const valorCS = parseInt(await inputCS.inputValue() || "0", 10);
-    await expect(valorCS).toBeLessThan(0);
+    await inputCS.fill('50');
+    await expect(inputCS).toHaveValue('50');
 
     // Prueba el cambio de tema
     const themeButton = page.locator('button[title="Cambiar Modo"]');

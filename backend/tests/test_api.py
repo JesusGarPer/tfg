@@ -53,11 +53,11 @@ def test_predict_win_success():
     response = client.post("/api/predict", json=payload)
 
     # Si el modelo está cargado, debería devolver 200 y una probabilidad
-    if response.status_code == 200:
-        data = response.json()
-        assert data["success"] is True
-        assert "win_probability" in data
-        assert 0.0 <= data["win_probability"] <= 1.0
+    assert response.status_code == 200, f"Error en /api/predict: {response.text}"
+    data = response.json()
+    assert data["success"] is True
+    assert "win_probability" in data
+    assert 0.0 <= data["win_probability"] <= 1.0
 
 
 def test_predict_match_full_payload():
@@ -107,9 +107,6 @@ def test_predict_match_full_payload():
     # Usamos TestClient para simular el ciclo real y cargar los modelos .pkl
     with TestClient(app) as test_client:
         response = test_client.post("/api/predict-match", json=payload)
-
-    # Ajusta la URL si tu endpoint no lleva el prefijo /api
-    response = client.post("/api/predict-match", json=payload)
 
     # Verificamos que la petición ha sido un éxito (HTTP 200 OK)
     assert response.status_code == 200, f"Error en la petición: {response.text}"
