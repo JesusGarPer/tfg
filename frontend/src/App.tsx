@@ -92,7 +92,7 @@ function App() {
               <span className="text-2xl">⏱️</span>
             </div>
 
-            <h2 className="text-xl font-semibold text-cyan-600 dark:text-cyan-200 mb-4">Modelo Predictivo @ Minuto 15</h2>
+            <h2 className="text-xl font-semibold text-cyan-600 dark:text-cyan-200 mb-4">Modelo Predictivo Minuto 15</h2>
 
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-12 leading-relaxed flex-grow max-w-sm">
               Predicción avanzada que incluye estadísticas del minuto 15:00 (oro, XP, kills, dragón). Mayor precisión basada en el estado real de la partida.

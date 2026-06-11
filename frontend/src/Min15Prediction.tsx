@@ -229,7 +229,7 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
       {/* Titulo */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold flex items-center gap-2">
-           <span className="text-cyan-400 text-xl transform -scale-x-100 -rotate-45">🗡️</span> Predicción @ Minuto 15
+           <span className="text-cyan-400 text-xl transform -scale-x-100 -rotate-45">🗡️</span> Predicción Minuto 15
         </h1>
         <p className="text-gray-500 text-xs mt-1">Configuración completa con estadísticas en tiempo real</p>
       </div>
@@ -360,7 +360,7 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                 </h3>
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor={`${team.id}-kills-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">⚔️ Asesinatos @ 15</label>
+                    <label htmlFor={`${team.id}-kills-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">⚔️ Asesinatos </label>
                     <div className="flex items-stretch w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg mt-1 overflow-hidden focus-within:border-cyan-500/50 transition-colors">
                       <button
                         type="button"
@@ -404,7 +404,7 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                     </div>
                   </div>
                   <div>
-                    <label htmlFor={`${team.id}-assists-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">👥 Asistencias @ 15</label>
+                    <label htmlFor={`${team.id}-assists-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">👥 Asistencias </label>
                     <div className="flex items-stretch w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg mt-1 overflow-hidden focus-within:border-cyan-500/50 transition-colors">
                       <button
                         type="button"
@@ -448,7 +448,7 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                     </div>
                   </div>
                   <div>
-                    <label htmlFor={`${team.id}-deaths-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">💀 Muertes @ 15</label>
+                    <label htmlFor={`${team.id}-deaths-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">💀 Muertes </label>
                     <div className="flex items-stretch w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg mt-1 overflow-hidden focus-within:border-cyan-500/50 transition-colors">
                       <button
                         type="button"
@@ -498,7 +498,6 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
 
           {/* Diferenciales */}
           <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800/80">
-            <h3 className="text-sm text-center text-gray-800 dark:text-gray-300 mb-6">Diferenciales @ 15:00</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
               <div className="border border-gray-200 dark:border-gray-800 bg-gray-300 dark:bg-[#0A0D14] rounded-xl p-4 flex flex-col items-center justify-center gap-4">
