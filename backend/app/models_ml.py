@@ -61,11 +61,12 @@ def ejecutar_inferencia(datos_entrada_dict):
 
             # Si el valor no fue visto durante el entrenamiento, detenemos la inferencia y lanzamos un error claro
             if valor_str not in le.classes_:
-                raise ValueError(
-                    f"Valor desconocido '{valor_str}' para la variable '{col}'."
+                logger.warning(
+                    f"Valor desconocido '{valor_str}' para la variable '{col}'. Asignando -1."
                 )
-
-            datos_procesados[col] = le.transform([valor_str])[0]
+                datos_procesados[col] = -1  # Valor nulo para categorías desconocidas
+            else:
+                datos_procesados[col] = le.transform([valor_str])[0]
 
     # Convertimos el diccionario a un array manteniendo el orden exacto en el que se entrenó el modelo
     orden_variables = [
