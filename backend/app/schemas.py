@@ -1,10 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Literal
 
 
 class PlayerData(BaseModel):
-    nombre: str
-    campeon: str
+    nombre: str = Field(..., min_length=1)
+    campeon: str = Field(..., min_length=1)
 
 
 class TeamPlayers(BaseModel):
@@ -16,7 +16,7 @@ class TeamPlayers(BaseModel):
 
 
 class TeamData(BaseModel):
-    teamname: str
+    teamname: str = Field(..., min_length=1)
     playoffs: int
     side: Literal["Blue", "Red"]
     jugadores: TeamPlayers
