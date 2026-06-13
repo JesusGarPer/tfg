@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test';
 
+
 test.describe('Flujo de la aplicación de predicción prepartida', () => {
+  /* // TEST COMENTADO: Módulo deshabilitado tras la fase de pruebas
   test('debe poder navegar a la vista prepartida y cambiar el tema', async ({ page }) => {
-    // Ajusta la URL al puerto donde levantes Vite (por defecto 5173)
     await page.goto('http://localhost:5173');
 
-    // Suponiendo que hay un botón en el inicio que lleva a PreMatchPrediction
+    // Clickamos en la tarjeta del Modelo Prepartida
     await page.click('text=Modelo Predictivo Prepartida');
 
     // Verifica que el componente cargó
@@ -19,11 +20,34 @@ test.describe('Flujo de la aplicación de predicción prepartida', () => {
     // Verifica que el botón de volver funciona
     await page.click('text=Volver al Inicio');
   });
+  */
+
+  test('debe mostrar el aviso de módulo deshabilitado al clickar en prepartida y permitir cerrarlo', async ({ page }) => {
+    await page.goto('http://localhost:5173');
+
+    // Clickamos en la tarjeta del Modelo Prepartida
+    await page.click('text=Modelo Predictivo Prepartida');
+
+    // Verificamos que el modal aparece con el título correcto
+    const modalTitle = page.locator('text=Módulo Deshabilitado');
+    await expect(modalTitle).toBeVisible();
+
+    // Verificamos que el texto explicativo está presente
+    const modalText = page.locator('text=El modelo predictivo prepartida se encuentra deshabilitado temporalmente');
+    await expect(modalText).toBeVisible();
+
+    // Clickamos en el botón de "Entendido" para cerrar el modal
+    const closeButton = page.locator('button', { hasText: 'Entendido' });
+    await closeButton.click();
+
+    // Verificamos que el modal ha desaparecido correctamente de la pantalla
+    await expect(modalTitle).toBeHidden();
+  });
 });
+
 
 test.describe('Flujo de la aplicación de predicción minuto 15', () => {
   test('debe poder navegar a la vista Min15 y cambiar el tema', async ({ page }) => {
-    // Ajusta la URL al puerto donde levantes Vite (por defecto 5173)
     await page.goto('http://localhost:5173');
 
     // Suponiendo que hay un botón en el inicio que lleva a PreMatchPrediction
