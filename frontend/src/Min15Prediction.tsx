@@ -144,9 +144,6 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setPrediction(null);
 
     const fd = new FormData(e.currentTarget);
 
@@ -192,6 +189,34 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
       equipo_azul: getTeamData('blue'),
       equipo_rojo: getTeamData('red')
     };
+
+    // Validar que ambos equipos estén seleccionados
+    if (!payload.equipo_azul.teamname || !payload.equipo_rojo.teamname) {
+      alert("⚠️ Por favor, selecciona un equipo para el lado Azul y el lado Rojo.");
+      return; // Detiene la ejecución, no envía la petición
+    }
+
+    // Extraer los 10 jugadores en un solo array para validarlos
+    const todosLosJugadores = [
+      ...Object.values(payload.equipo_azul.jugadores),
+      ...Object.values(payload.equipo_rojo.jugadores)
+    ];
+
+    // Comprobar si alguno tiene el nombre o el campeón vacío
+    const faltanDatos = todosLosJugadores.some(
+      (jugador) => !jugador.nombre || jugador.nombre.trim() === "" ||
+                   !jugador.campeon || jugador.campeon.trim() === ""
+    );
+
+    if (faltanDatos) {
+      alert("⚠️ Por favor, rellena el nombre y el campeón de los 10 jugadores antes de predecir.");
+      return; // Detiene la ejecución
+    }
+
+    // Si pasa la validación, iniciamos los estados de carga
+    setLoading(true);
+    setError(null);
+    setPrediction(null);
 
     try {
         const res = await fetch('http://localhost:8000/api/predict-match', {
