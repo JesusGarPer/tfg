@@ -50,7 +50,9 @@ def test_predict_win_success():
         "comp_early_power": 3.5,
     }
 
-    response = client.post("/api/predict", json=payload)
+    # Usamos TestClient para simular el ciclo real y cargar los modelos .pkl
+    with TestClient(app) as test_client:
+        response = test_client.post("/api/predict", json=payload)
 
     # Si el modelo está cargado, debería devolver 200 y una probabilidad
     assert response.status_code == 200, f"Error en /api/predict: {response.text}"
