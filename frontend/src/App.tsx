@@ -22,6 +22,27 @@ function App() {
     }
   }, [isDark]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowWarning(false);
+      }
+    };
+
+    if (showWarning) {
+      // Escuchamos la tecla ESC a nivel global
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    // Cleanup: Limpiamos todo si el modal se cierra o el componente se desmonta
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showWarning]);
+
   if (view === 'min15') {
     return <Min15Prediction onBack={() => setView('home')} isDark={isDark} toggleTheme={() => setIsDark(!isDark)} />;
   }
@@ -35,8 +56,17 @@ function App() {
 
       {/* Pop-up de Aviso (Modal) */}
       {showWarning && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
-          <div className="bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-purple-500/30 rounded-2xl p-8 max-w-md w-full shadow-[0_0_40px_rgba(168,85,247,0.15)] relative transform transition-all">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity"
+          onClick={() => setShowWarning(false)} // Cerrar al clickar fuera
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+            className="bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-purple-500/30 rounded-2xl p-8 max-w-md w-full shadow-[0_0_40px_rgba(168,85,247,0.15)] relative transform transition-all"
+            onClick={(e) => e.stopPropagation()} // Evitar que el click dentro del modal lo cierre
+          >
             <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-500/20 flex items-center justify-center mb-4 border border-purple-200 dark:border-purple-500/30">
               <span className="text-2xl leading-none pb-1">⚠️</span>
             </div>
