@@ -61,9 +61,6 @@ function App() {
           onClick={() => setShowWarning(false)} // Cerrar al clickar fuera
         >
           <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="modal-title"
             className="bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-purple-500/30 rounded-2xl p-8 max-w-md w-full shadow-[0_0_40px_rgba(168,85,247,0.15)] relative transform transition-all"
             onClick={(e) => e.stopPropagation()} // Evitar que el click dentro del modal lo cierre
           >
