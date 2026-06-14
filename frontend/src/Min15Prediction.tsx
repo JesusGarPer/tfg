@@ -458,6 +458,7 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                             e.preventDefault();
                             handlePressEnd();
                           }}
+                          onTouchCancel={handlePressEnd}
                           className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
                         >
                           +
@@ -478,6 +479,7 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                             e.preventDefault();
                             handlePressEnd();
                           }}
+                          onTouchCancel={handlePressEnd}
                           className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
                         >
                           −
@@ -508,6 +510,7 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                             e.preventDefault();
                             handlePressEnd();
                           }}
+                          onTouchCancel={handlePressEnd}
                           className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
                         >
                           +
@@ -559,6 +562,7 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                             e.preventDefault();
                             handlePressEnd();
                           }}
+                          onTouchCancel={handlePressEnd}
                           className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
                         >
                           +
@@ -588,7 +592,11 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                             e.preventDefault();
                             handlePressEnd();
                           }}
-                  className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">−</button>
+                    onTouchCancel={handlePressEnd}
+                    className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                  >
+                    −
+                  </button>
                   <div className="flex-1 flex items-center justify-center">
                     <input id="diff-gold" name="diff_gold" type="text" inputMode="decimal" pattern="-?[0-9.]*" defaultValue="0" onInput={(e) => {
                         const target = e.target as HTMLInputElement;
@@ -623,7 +631,11 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                             e.preventDefault();
                             handlePressEnd();
                           }}
-                  className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">+</button>
+                    onTouchCancel={handlePressEnd}
+                    className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                    >
+                      +
+                    </button>
                 </div>
                 <span className="text-[12px] text-gray-600 dark:text-gray-500 block leading-tight">Positivo favorece azul, negativo favorece rojo</span>
               </div>
@@ -641,7 +653,11 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                             e.preventDefault();
                             handlePressEnd();
                           }}
-                  className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">−</button>
+                    onTouchCancel={handlePressEnd}
+                    className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                  >
+                    −
+                  </button>
                   <input id="diff-level" name="diff_level" type="text" inputMode="numeric" pattern="-?[0-9]*" defaultValue="0" onInput={(e) => {
                     const target = e.target as HTMLInputElement;
                     let val = target.value.replace(/[^0-9-]/g, '');
@@ -668,7 +684,11 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                             e.preventDefault();
                             handlePressEnd();
                           }}
-                  className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">+</button>
+                    onTouchCancel={handlePressEnd}
+                    className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                  >
+                    +
+                  </button>
                 </div>
                 <span className="text-[12px] text-gray-600 dark:text-gray-500 block text-center leading-tight">Diferencia total sumando las 5 posiciones<br/>Positivo favorece azul, negativo favorece rojo</span>
               </div>
@@ -686,7 +706,11 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                             e.preventDefault();
                             handlePressEnd();
                           }}
-                  className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">−</button>
+                    onTouchCancel={handlePressEnd}
+                    className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                  >
+                    −
+                  </button>
                   <input id="diff-cs" name="diff_cs" type="text" inputMode="numeric" pattern="-?[0-9]*" defaultValue="0" onInput={(e) => {
                     const target = e.target as HTMLInputElement;
                     let val = target.value.replace(/[^0-9-]/g, '');
@@ -713,7 +737,11 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                             e.preventDefault();
                             handlePressEnd();
                           }}
-                  className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">+</button>
+                    onTouchCancel={handlePressEnd}
+                    className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                  >
+                    +
+                  </button>
                 </div>
                 <span className="text-[12px] text-gray-600 dark:text-gray-500 block leading-tight">Positivo favorece azul, negativo favorece rojo</span>
               </div>
