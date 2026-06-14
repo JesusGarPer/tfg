@@ -97,27 +97,33 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
       .catch(console.error);
   }, []);
 
-  // --- LÓGICA PARA MANTENER PULSADO (LONG PRESS) ---
-  const timerRef = useRef<number | null>(null);
+  // --- LÓGICA UNIFICADA PARA MANTENER PULSADO (LONG PRESS PC + MÓVIL) ---
   const timeoutRef = useRef<number | null>(null);
+  const intervalRef = useRef<number | null>(null);
 
   useEffect(() => {
     return () => {
-      if (timerRef.current !== null) window.clearInterval(timerRef.current);
-      if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
+      stopAction();
     };
   }, []);
 
-  const handlePressStart = (id: string, step: number, min: number, max: number, isDecimal: boolean = false, linkedId: string | null = null) => {
-    if (timerRef.current !== null) {
-      window.clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
+  // Función centralizada para detener cualquier temporizador activo
+  const stopAction = () => {
     if (timeoutRef.current !== null) {
       window.clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
+    if (intervalRef.current !== null) {
+      window.clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
 
+  const handlePressStart = (id: string, step: number, min: number, max: number, isDecimal: boolean = false, linkedId: string | null = null) => {
+    // Limpiamos cualquier temporizador previo antes de empezar
+    stopAction();
+
+    // Actualizamos el valor inmediatamente al presionar
     const updateValue = () => {
       const input = document.getElementById(id) as HTMLInputElement;
       if (!input) return;
@@ -144,22 +150,17 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
     };
 
     updateValue();
+
+
+    // Esperamos 400ms antes de empezar a incrementar/decrementar de manera continua
     timeoutRef.current = window.setTimeout(() => {
-      // Si el usuario no ha soltado el botón tras medio segundo (500ms), empezamos a sumar de manera continua (cada 60ms)
-      timerRef.current = window.setInterval(updateValue, 60);
-    }, 500);
+      // Si el usuario no ha soltado el botón, empezamos a sumar de manera continua (cada 60ms)
+      intervalRef.current = window.setInterval(updateValue, 60);
+    }, 400);
   };
 
-  const handlePressEnd = () => {
-    if (timeoutRef.current !== null) {
-      window.clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-    if (timerRef.current !== null) {
-      window.clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-  };
+  // Mantenemos handlePressEnd para no tener que cambiar tus eventos del HTML
+  const handlePressEnd = stopAction;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -419,7 +420,11 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                           onMouseUp={handlePressEnd}
                           onMouseLeave={handlePressEnd}
                           onTouchStart={() => handlePressStart(`${team.id}-kills-15`, -1, 0, 99, false, linkedDeathsId)}
-                          onTouchEnd={handlePressEnd}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handlePressEnd();
+                          }}
+                          onTouchCancel={handlePressEnd}
                           className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
                         >
                           −
@@ -449,7 +454,10 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                           onMouseUp={handlePressEnd}
                           onMouseLeave={handlePressEnd}
                           onTouchStart={() => handlePressStart(`${team.id}-kills-15`, 1, 0, 99, false, linkedDeathsId)}
-                          onTouchEnd={handlePressEnd}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handlePressEnd();
+                          }}
                           className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
                         >
                           +
@@ -466,7 +474,10 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                           onMouseUp={handlePressEnd}
                           onMouseLeave={handlePressEnd}
                           onTouchStart={() => handlePressStart(`${team.id}-assists-15`, -1, 0, 99, false)}
-                          onTouchEnd={handlePressEnd}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handlePressEnd();
+                          }}
                           className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
                         >
                           −
@@ -493,7 +504,10 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                           onMouseUp={handlePressEnd}
                           onMouseLeave={handlePressEnd}
                           onTouchStart={() => handlePressStart(`${team.id}-assists-15`, 1, 0, 99, false)}
-                          onTouchEnd={handlePressEnd}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handlePressEnd();
+                          }}
                           className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
                         >
                           +
@@ -510,7 +524,11 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                           onMouseUp={handlePressEnd}
                           onMouseLeave={handlePressEnd}
                           onTouchStart={() => handlePressStart(`${team.id}-deaths-15`, -1, 0, 99, false)}
-                          onTouchEnd={handlePressEnd}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handlePressEnd();
+                          }}
+                          onTouchCancel={handlePressEnd}
                           className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
                         >
                           −
@@ -537,7 +555,10 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                           onMouseUp={handlePressEnd}
                           onMouseLeave={handlePressEnd}
                           onTouchStart={() => handlePressStart(`${team.id}-deaths-15`, 1, 0, 99, false)}
-                          onTouchEnd={handlePressEnd}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handlePressEnd();
+                          }}
                           className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
                         >
                           +
@@ -557,7 +578,16 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
               <div className="border border-gray-200 dark:border-gray-800 bg-gray-300 dark:bg-[#0A0D14] rounded-xl p-4 flex flex-col items-center justify-center gap-4">
                 <label htmlFor="diff-gold" className="text-md text-yellow-700 dark:text-yellow-600 flex items-center gap-1 mb-3">💰 Diferencia de Oro</label>
                 <div className="flex items-stretch w-full max-w-[200px] bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden focus-within:border-cyan-500/50 transition-colors mb-2">
-                  <button type="button" tabIndex={-1} onMouseDown={() => handlePressStart("diff-gold", -0.1, -20, 20, true)} onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd} onTouchStart={() => handlePressStart("diff-gold", -0.1, -20, 20, true)} onTouchEnd={handlePressEnd}
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    onMouseDown={() => handlePressStart("diff-gold", -0.1, -20, 20, true)}
+                    onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd}
+                    onTouchStart={() => handlePressStart("diff-gold", -0.1, -20, 20, true)}
+                    onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handlePressEnd();
+                          }}
                   className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">−</button>
                   <div className="flex-1 flex items-center justify-center">
                     <input id="diff-gold" name="diff_gold" type="text" inputMode="decimal" pattern="-?[0-9.]*" defaultValue="0" onInput={(e) => {
@@ -583,7 +613,16 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                     className="w-14 bg-transparent py-2 pl-2 pr-0.5 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                     <span className="text-center text-sm font-medium text-gray-800 dark:text-gray-300 select-none pr-2">K</span>
                   </div>
-                  <button type="button" tabIndex={-1} onMouseDown={() => handlePressStart("diff-gold", 0.1, -20, 20, true)} onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd} onTouchStart={() => handlePressStart("diff-gold", 0.1, -20, 20, true)} onTouchEnd={handlePressEnd}
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    onMouseDown={() => handlePressStart("diff-gold", 0.1, -20, 20, true)}
+                    onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd}
+                    onTouchStart={() => handlePressStart("diff-gold", 0.1, -20, 20, true)}
+                    onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handlePressEnd();
+                          }}
                   className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">+</button>
                 </div>
                 <span className="text-[12px] text-gray-600 dark:text-gray-500 block leading-tight">Positivo favorece azul, negativo favorece rojo</span>
@@ -592,7 +631,16 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
               <div className="border border-gray-200 dark:border-gray-800 bg-gray-300 dark:bg-[#0A0D14] rounded-xl p-4 flex flex-col items-center justify-between">
                 <label htmlFor="diff-level" className="text-md text-blue-800 dark:text-blue-500 flex items-center gap-1 mb-3">⭐ Ventaja de Niveles (Global)</label>
                 <div className="flex items-stretch w-full max-w-[200px] bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden focus-within:border-cyan-500/50 transition-colors mb-2">
-                  <button type="button" tabIndex={-1} onMouseDown={() => handlePressStart("diff-level", -1, -99, 99)} onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd} onTouchStart={() => handlePressStart("diff-level", -1, -99, 99)} onTouchEnd={handlePressEnd}
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    onMouseDown={() => handlePressStart("diff-level", -1, -99, 99)}
+                    onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd}
+                    onTouchStart={() => handlePressStart("diff-level", -1, -99, 99)}
+                    onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handlePressEnd();
+                          }}
                   className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">−</button>
                   <input id="diff-level" name="diff_level" type="text" inputMode="numeric" pattern="-?[0-9]*" defaultValue="0" onInput={(e) => {
                     const target = e.target as HTMLInputElement;
@@ -610,7 +658,16 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                     target.value = val;
                   }}
                   className="flex-1 w-full bg-transparent p-2 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
-                  <button type="button" tabIndex={-1} onMouseDown={() => handlePressStart("diff-level", 1, -99, 99)} onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd} onTouchStart={() => handlePressStart("diff-level", 1, -99, 99)} onTouchEnd={handlePressEnd}
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    onMouseDown={() => handlePressStart("diff-level", 1, -99, 99)}
+                    onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd}
+                    onTouchStart={() => handlePressStart("diff-level", 1, -99, 99)}
+                    onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handlePressEnd();
+                          }}
                   className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">+</button>
                 </div>
                 <span className="text-[12px] text-gray-600 dark:text-gray-500 block text-center leading-tight">Diferencia total sumando las 5 posiciones<br/>Positivo favorece azul, negativo favorece rojo</span>
@@ -619,7 +676,16 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
               <div className="border border-gray-200 dark:border-gray-800 bg-gray-300 dark:bg-[#0A0D14] rounded-xl p-4 flex flex-col items-center justify-center gap-4">
                 <label htmlFor="diff-cs" className="text-md text-green-800 dark:text-green-600 flex items-center gap-1 mb-3">🎯 Diferencia de CS (Farmeo)</label>
                 <div className="flex items-stretch w-full max-w-[200px] bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden focus-within:border-cyan-500/50 transition-colors mb-2">
-                  <button type="button" tabIndex={-1} onMouseDown={() => handlePressStart("diff-cs", -1, -999, 999)} onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd} onTouchStart={() => handlePressStart("diff-cs", -1, -999, 999)} onTouchEnd={handlePressEnd}
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    onMouseDown={() => handlePressStart("diff-cs", -1, -999, 999)}
+                    onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd}
+                    onTouchStart={() => handlePressStart("diff-cs", -1, -999, 999)}
+                    onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handlePressEnd();
+                          }}
                   className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">−</button>
                   <input id="diff-cs" name="diff_cs" type="text" inputMode="numeric" pattern="-?[0-9]*" defaultValue="0" onInput={(e) => {
                     const target = e.target as HTMLInputElement;
@@ -637,7 +703,16 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
                     target.value = val;
                   }}
                   className="flex-1 w-full bg-transparent p-2 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
-                  <button type="button" tabIndex={-1} onMouseDown={() => handlePressStart("diff-cs", 1, -999, 999)} onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd} onTouchStart={() => handlePressStart("diff-cs", 1, -999, 999)} onTouchEnd={handlePressEnd}
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    onMouseDown={() => handlePressStart("diff-cs", 1, -999, 999)}
+                    onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd}
+                    onTouchStart={() => handlePressStart("diff-cs", 1, -999, 999)}
+                    onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handlePressEnd();
+                          }}
                   className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">+</button>
                 </div>
                 <span className="text-[12px] text-gray-600 dark:text-gray-500 block leading-tight">Positivo favorece azul, negativo favorece rojo</span>
