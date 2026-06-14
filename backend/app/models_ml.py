@@ -54,18 +54,26 @@ def ejecutar_inferencia(datos_entrada_dict):
     # Hacemos una copia para no alterar el diccionario original por referencia
     datos_procesados = datos_entrada_dict.copy()
 
+    # Columnas para las que un valor no visto se trata como "UNKNOWN" (categoría entrenada para ello)
+    champ_cols = ["champ_top", "champ_jng", "champ_mid", "champ_bot", "champ_sup"]
+    cols_con_unknown = champ_cols + ["teamname"]
+
     # Transformamos las variables categóricas
     for col, le in label_encoders.items():
         if col in datos_procesados:
             valor_str = str(datos_procesados[col])
 
-            # Si el valor no fue visto durante el entrenamiento, detenemos la inferencia y lanzamos un error claro
-            if valor_str not in le.classes_:
-                raise ValueError(
-                    f"Valor desconocido '{valor_str}' para la variable '{col}'."
+            if valor_str in le.classes_:
+                datos_procesados[col] = le.transform([valor_str])[0]
+            elif col in cols_con_unknown:
+                logger.warning(
+                    f"Valor desconocido '{valor_str}' para la variable '{col}'. Usando UNKNOWN."
                 )
-
-            datos_procesados[col] = le.transform([valor_str])[0]
+                datos_procesados[col] = le.transform(["UNKNOWN"])[0]
+            else:
+                raise ValueError(
+                    f"Valor desconocido '{valor_str}' para la variable '{col}'"
+                )
 
     # Convertimos el diccionario a un array manteniendo el orden exacto en el que se entrenó el modelo
     orden_variables = [

@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useRef,  type FormEvent } from 'react';
 import { getChampImage, getTeamLogo } from './utils/imageMapping';
 import SearchableSelect from './utils/SearchableSelect';
 
@@ -97,11 +97,72 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
       .catch(console.error);
   }, []);
 
+  // --- LÓGICA PARA MANTENER PULSADO (LONG PRESS) ---
+  const timerRef = useRef<number | null>(null);
+  const timeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current !== null) window.clearInterval(timerRef.current);
+      if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  const handlePressStart = (id: string, step: number, min: number, max: number, isDecimal: boolean = false, linkedId: string | null = null) => {
+    if (timerRef.current !== null) {
+      window.clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    if (timeoutRef.current !== null) {
+      window.clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+
+    const updateValue = () => {
+      const input = document.getElementById(id) as HTMLInputElement;
+      if (!input) return;
+
+      let newValStr = "";
+
+      if (isDecimal) {
+        const parsed = parseFloat(input.value || "0");
+        const val = Number.isNaN(parsed) ? 0 : parsed;
+        newValStr = Math.min(max, Math.max(min, val + step)).toFixed(1);
+
+      } else {
+        const parsed = parseInt(input.value || "0", 10);
+        const val = Number.isNaN(parsed) ? 0 : parsed;
+        newValStr = Math.min(max, Math.max(min, val + step)).toString();
+      }
+
+      input.value = newValStr;
+
+      if (linkedId) {
+        const linkedInput = document.getElementById(linkedId) as HTMLInputElement;
+        if (linkedInput) linkedInput.value = newValStr;
+      }
+    };
+
+    updateValue();
+    timeoutRef.current = window.setTimeout(() => {
+      // Si el usuario no ha soltado el botón tras medio segundo (500ms), empezamos a sumar de manera continua (cada 60ms)
+      timerRef.current = window.setInterval(updateValue, 60);
+    }, 500);
+  };
+
+  const handlePressEnd = () => {
+    if (timeoutRef.current !== null) {
+      window.clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    if (timerRef.current !== null) {
+      window.clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setPrediction(null);
 
     const fd = new FormData(e.currentTarget);
 
@@ -140,7 +201,7 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
         assists_rojo: Number(fd.get(`red_assists_15`)) || 0,
         deaths_azul: Number(fd.get(`blue_deaths_15`)) || 0,
         deaths_rojo: Number(fd.get(`red_deaths_15`)) || 0,
-        gold_diff: Number(fd.get(`diff_gold`)) || 0,
+        gold_diff: Number(fd.get(`diff_gold`)) * 1000 || 0,
         xp_diff: Number(fd.get(`diff_level`)) * 1180 || 0, // aproximación de "Ventaja de Niveles" -> xp
         cs_diff: Number(fd.get(`diff_cs`)) || 0,
       },
@@ -148,8 +209,36 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
       equipo_rojo: getTeamData('red')
     };
 
+    // Validar que ambos equipos estén seleccionados
+    if (!payload.equipo_azul.teamname || !payload.equipo_rojo.teamname) {
+      alert("⚠️ Por favor, selecciona un equipo para el lado Azul y el lado Rojo.");
+      return; // Detiene la ejecución, no envía la petición
+    }
+
+    // Extraer los 10 jugadores en un solo array para validarlos
+    const todosLosJugadores = [
+      ...Object.values(payload.equipo_azul.jugadores),
+      ...Object.values(payload.equipo_rojo.jugadores)
+    ];
+
+    // Comprobar si alguno tiene el nombre o el campeón vacío
+    const faltanDatos = todosLosJugadores.some(
+      (jugador) => !jugador.nombre || jugador.nombre.trim() === "" ||
+                   !jugador.campeon || jugador.campeon.trim() === ""
+    );
+
+    if (faltanDatos) {
+      alert("⚠️ Por favor, rellena el nombre y el campeón de los 10 jugadores antes de predecir.");
+      return; // Detiene la ejecución
+    }
+
+    // Si pasa la validación, iniciamos los estados de carga
+    setLoading(true);
+    setError(null);
+    setPrediction(null);
+
     try {
-        const res = await fetch('http://localhost:8000/api/predict-match', {
+        const res = await fetch(`${API_BASE_URL}/api/predict-match`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(payload)
@@ -184,7 +273,7 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
       {/* Titulo */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold flex items-center gap-2">
-           <span className="text-cyan-400 text-xl transform -scale-x-100 -rotate-45">🗡️</span> Predicción @ Minuto 15
+           <span className="text-cyan-400 text-xl transform -scale-x-100 -rotate-45">🗡️</span> Predicción Minuto 15
         </h1>
         <p className="text-gray-500 text-xs mt-1">Configuración completa con estadísticas en tiempo real</p>
       </div>
@@ -308,123 +397,193 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {TEAMS.map(team => (
-              <div key={team.id} className={`border ${team.statsBorder} bg-gray-50/70 dark:bg-[#0A0D14]/70 rounded-xl p-5`}>
-                <h3 className={`${team.textTitle} font-medium flex items-center gap-2 mb-4 text-sm`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${team.badgeBg}`}></span> {team.name}
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <label htmlFor={`${team.id}-kills-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">⚔️ Asesinatos @ 15</label>
-                    <div className="flex items-stretch w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg mt-1 overflow-hidden focus-within:border-cyan-500/50 transition-colors">
-                      <button
-                        type="button"
-                        tabIndex={-1}
-                        onClick={(e) => { const input = e.currentTarget.nextElementSibling as HTMLInputElement; const currentValue = parseInt(input.value || "0"); input.value = Math.max(0, currentValue - 1).toString();  }}
-                        className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
-                      >
-                        −
-                      </button>
-                      <input
-                        id={`${team.id}-kills-15`}
-                        name={`${team.id}_kills_15`}
-                        type="text" inputMode="numeric" pattern="[0-9]*" defaultValue="0"
-                        onInput={(e) => {
-                          const target = e.target as HTMLInputElement;
-                          target.value = target.value.replace(/[^0-9]/g, '');
-                        }}
-                        className="flex-1 w-full bg-transparent p-2.5 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      />
-                      <button
-                        type="button"
-                        tabIndex={-1}
-                        onClick={(e) => { const input = e.currentTarget.previousElementSibling as HTMLInputElement; const currentValue = parseInt(input.value || "0"); input.value = (currentValue + 1).toString(); }}
-                        className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
-                      >
-                        +
-                      </button>
+            {TEAMS.map(team => {
+            // Calculamos el ID del equipo contrario para sincronizar las kills y muertes
+            const enemyId = team.id === 'blue' ? 'red' : 'blue';
+            const linkedDeathsId = `${enemyId}-deaths-15`;
+              return (
+
+
+                <div key={team.id} className={`border ${team.statsBorder} bg-gray-50/70 dark:bg-[#0A0D14]/70 rounded-xl p-5`}>
+                  <h3 className={`${team.textTitle} font-medium flex items-center gap-2 mb-4 text-sm`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${team.badgeBg}`}></span> {team.name}
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label htmlFor={`${team.id}-kills-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">⚔️ Asesinatos </label>
+                      <div className="flex items-stretch w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg mt-1 overflow-hidden focus-within:border-cyan-500/50 transition-colors">
+                        <button
+                          type="button"
+                          tabIndex={-1}
+                          onMouseDown={() => handlePressStart(`${team.id}-kills-15`, -1, 0, 99, false, linkedDeathsId)}
+                          onMouseUp={handlePressEnd}
+                          onMouseLeave={handlePressEnd}
+                          onTouchStart={() => handlePressStart(`${team.id}-kills-15`, -1, 0, 99, false, linkedDeathsId)}
+                          onTouchEnd={handlePressEnd}
+                          className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                        >
+                          −
+                        </button>
+                        <input
+                          id={`${team.id}-kills-15`}
+                          name={`${team.id}_kills_15`}
+                          type="text" inputMode="numeric" pattern="[0-9]*" defaultValue="0"
+                          onInput={(e) => {
+                            const target = e.target as HTMLInputElement;
+                            let val = target.value.replace(/[^0-9]/g, '');
+                            if (val !== '') {
+                              const num = parseInt(val, 10);
+                              if (num > 99) val = '99';
+                            }
+                            target.value = val;
+
+                            const linkedInput = document.getElementById(linkedDeathsId) as HTMLInputElement;
+                            if (linkedInput) linkedInput.value = val || "0";
+                          }}
+                          className="flex-1 w-full bg-transparent p-2.5 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                        <button
+                          type="button"
+                          tabIndex={-1}
+                          onMouseDown={() => handlePressStart(`${team.id}-kills-15`, 1, 0, 99, false, linkedDeathsId)}
+                          onMouseUp={handlePressEnd}
+                          onMouseLeave={handlePressEnd}
+                          onTouchStart={() => handlePressStart(`${team.id}-kills-15`, 1, 0, 99, false, linkedDeathsId)}
+                          onTouchEnd={handlePressEnd}
+                          className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <label htmlFor={`${team.id}-assists-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">👥 Asistencias @ 15</label>
-                    <div className="flex items-stretch w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg mt-1 overflow-hidden focus-within:border-cyan-500/50 transition-colors">
-                      <button
-                        type="button"
-                        tabIndex={-1}
-                        onClick={(e) => { const input = e.currentTarget.nextElementSibling as HTMLInputElement; const currentValue = parseInt(input.value || "0"); input.value = Math.max(0, currentValue - 1).toString();  }}
-                        className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
-                      >
-                        −
-                      </button>
-                      <input
-                        id={`${team.id}-assists-15`}
-                        name={`${team.id}_assists_15`}
-                        type="text" inputMode="numeric" pattern="[0-9]*" defaultValue="0"
-                        onInput={(e) => {
-                          const target = e.target as HTMLInputElement;
-                          target.value = target.value.replace(/[^0-9]/g, '');
-                        }}
-                        className="flex-1 w-full bg-transparent p-2.5 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      />
-                      <button
-                        type="button"
-                        tabIndex={-1}
-                        onClick={(e) => { const input = e.currentTarget.previousElementSibling as HTMLInputElement; const currentValue = parseInt(input.value || "0"); input.value = (currentValue + 1).toString(); }}
-                        className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
-                      >
-                        +
-                      </button>
+                    <div>
+                      <label htmlFor={`${team.id}-assists-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">👥 Asistencias </label>
+                      <div className="flex items-stretch w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg mt-1 overflow-hidden focus-within:border-cyan-500/50 transition-colors">
+                        <button
+                          type="button"
+                          tabIndex={-1}
+                          onMouseDown={() => handlePressStart(`${team.id}-assists-15`, -1, 0, 99, false)}
+                          onMouseUp={handlePressEnd}
+                          onMouseLeave={handlePressEnd}
+                          onTouchStart={() => handlePressStart(`${team.id}-assists-15`, -1, 0, 99, false)}
+                          onTouchEnd={handlePressEnd}
+                          className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                        >
+                          −
+                        </button>
+                        <input
+                          id={`${team.id}-assists-15`}
+                          name={`${team.id}_assists_15`}
+                          type="text" inputMode="numeric" pattern="[0-9]*" defaultValue="0"
+                          onInput={(e) => {
+                            const target = e.target as HTMLInputElement;
+                            let val = target.value.replace(/[^0-9]/g, '');
+                            if (val !== '') {
+                              const num = parseInt(val, 10);
+                              if (num > 99) val = '99';
+                            }
+                            target.value = val;
+                          }}
+                          className="flex-1 w-full bg-transparent p-2.5 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                        <button
+                          type="button"
+                          tabIndex={-1}
+                          onMouseDown={() => handlePressStart(`${team.id}-assists-15`, 1, 0, 99, false)}
+                          onMouseUp={handlePressEnd}
+                          onMouseLeave={handlePressEnd}
+                          onTouchStart={() => handlePressStart(`${team.id}-assists-15`, 1, 0, 99, false)}
+                          onTouchEnd={handlePressEnd}
+                          className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <label htmlFor={`${team.id}-deaths-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">💀 Muertes @ 15</label>
-                    <div className="flex items-stretch w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg mt-1 overflow-hidden focus-within:border-cyan-500/50 transition-colors">
-                      <button
-                        type="button"
-                        tabIndex={-1}
-                        onClick={(e) => { const input = e.currentTarget.nextElementSibling as HTMLInputElement; const currentValue = parseInt(input.value || "0"); input.value = Math.max(0, currentValue - 1).toString(); }}
-                        className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
-                      >
-                        −
-                      </button>
-                      <input
-                        id={`${team.id}-deaths-15`}
-                        name={`${team.id}_deaths_15`}
-                        type="text" inputMode="numeric" pattern="[0-9]*" defaultValue="0"
-                        onInput={(e) => {
-                          const target = e.target as HTMLInputElement;
-                          target.value = target.value.replace(/[^0-9]/g, '');
-                        }}
-                        className="flex-1 w-full bg-transparent p-2.5 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      />
-                      <button
-                        type="button"
-                        tabIndex={-1}
-                        onClick={(e) => { const input = e.currentTarget.previousElementSibling as HTMLInputElement; const currentValue = parseInt(input.value || "0"); input.value = (currentValue + 1).toString(); }}
-                        className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
-                      >
-                        +
-                      </button>
+                    <div>
+                      <label htmlFor={`${team.id}-deaths-15`} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-800 pb-1">💀 Muertes </label>
+                      <div className="flex items-stretch w-full bg-gray-300 dark:bg-[#0A0D14] border border-gray-200 dark:border-gray-800 rounded-lg mt-1 overflow-hidden focus-within:border-cyan-500/50 transition-colors">
+                        <button
+                          type="button"
+                          tabIndex={-1}
+                          onMouseDown={() => handlePressStart(`${team.id}-deaths-15`, -1, 0, 99, false)}
+                          onMouseUp={handlePressEnd}
+                          onMouseLeave={handlePressEnd}
+                          onTouchStart={() => handlePressStart(`${team.id}-deaths-15`, -1, 0, 99, false)}
+                          onTouchEnd={handlePressEnd}
+                          className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                        >
+                          −
+                        </button>
+                        <input
+                          id={`${team.id}-deaths-15`}
+                          name={`${team.id}_deaths_15`}
+                          type="text" inputMode="numeric" pattern="[0-9]*" defaultValue="0"
+                          onInput={(e) => {
+                            const target = e.target as HTMLInputElement;
+                            let val = target.value.replace(/[^0-9]/g, '');
+                            if (val !== '') {
+                              const num = parseInt(val, 10);
+                              if (num > 99) val = '99';
+                            }
+                            target.value = val;
+                          }}
+                          className="flex-1 w-full bg-transparent p-2.5 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                        <button
+                          type="button"
+                          tabIndex={-1}
+                          onMouseDown={() => handlePressStart(`${team.id}-deaths-15`, 1, 0, 99, false)}
+                          onMouseUp={handlePressEnd}
+                          onMouseLeave={handlePressEnd}
+                          onTouchStart={() => handlePressStart(`${team.id}-deaths-15`, 1, 0, 99, false)}
+                          onTouchEnd={handlePressEnd}
+                          className="flex items-center justify-center w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-400 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Diferenciales */}
           <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800/80">
-            <h3 className="text-sm text-center text-gray-800 dark:text-gray-300 mb-6">Diferenciales @ 15:00</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
               <div className="border border-gray-200 dark:border-gray-800 bg-gray-300 dark:bg-[#0A0D14] rounded-xl p-4 flex flex-col items-center justify-center gap-4">
                 <label htmlFor="diff-gold" className="text-md text-yellow-700 dark:text-yellow-600 flex items-center gap-1 mb-3">💰 Diferencia de Oro</label>
                 <div className="flex items-stretch w-full max-w-[200px] bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden focus-within:border-cyan-500/50 transition-colors mb-2">
-                  <button type="button" tabIndex={-1} onClick={(e) => { const input = e.currentTarget.nextElementSibling as HTMLInputElement;input.value = (parseInt(input.value || "0") - 1).toString();}}
+                  <button type="button" tabIndex={-1} onMouseDown={() => handlePressStart("diff-gold", -0.1, -20, 20, true)} onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd} onTouchStart={() => handlePressStart("diff-gold", -0.1, -20, 20, true)} onTouchEnd={handlePressEnd}
                   className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">−</button>
-                  <input id="diff-gold" name="diff_gold" type="text" inputMode="numeric" pattern="-?[0-9]*" defaultValue="0" onInput={(e) => {const target = e.target as HTMLInputElement;target.value = target.value.replace(/[^0-9-]/g, '');}}
-                  className="flex-1 w-full bg-transparent p-2 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
-                  <button type="button" tabIndex={-1} onClick={(e) => {const input = e.currentTarget.previousElementSibling as HTMLInputElement;input.value = (parseInt(input.value || "0") + 1).toString();}}
+                  <div className="flex-1 flex items-center justify-center">
+                    <input id="diff-gold" name="diff_gold" type="text" inputMode="decimal" pattern="-?[0-9.]*" defaultValue="0" onInput={(e) => {
+                        const target = e.target as HTMLInputElement;
+                        let val = target.value.replace(/,/g, '.');
+                        val = val.replace(/[^0-9.-]/g, '');
+                        const startsWithMinus = val.startsWith('-');
+                        val = val.replace(/-/g, '');
+                        if (startsWithMinus) {
+                          val = '-' + val;
+                        }
+                        const parts = val.split('.');
+                        if (parts.length > 2) {
+                          val = parts[0] + '.' + parts.slice(1).join('');
+                        }
+                        if (val !== '' && val !== '-' && val !== '-.' && val !== '.') {
+                          const num = parseFloat(val);
+                          if (num > 20) val = '20';
+                          if (num < -20) val = '-20';
+                        }
+                        target.value = val;
+                      }}
+                    className="w-14 bg-transparent py-2 pl-2 pr-0.5 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                    <span className="text-center text-sm font-medium text-gray-800 dark:text-gray-300 select-none pr-2">K</span>
+                  </div>
+                  <button type="button" tabIndex={-1} onMouseDown={() => handlePressStart("diff-gold", 0.1, -20, 20, true)} onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd} onTouchStart={() => handlePressStart("diff-gold", 0.1, -20, 20, true)} onTouchEnd={handlePressEnd}
                   className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">+</button>
                 </div>
                 <span className="text-[12px] text-gray-600 dark:text-gray-500 block leading-tight">Positivo favorece azul, negativo favorece rojo</span>
@@ -433,11 +592,25 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
               <div className="border border-gray-200 dark:border-gray-800 bg-gray-300 dark:bg-[#0A0D14] rounded-xl p-4 flex flex-col items-center justify-between">
                 <label htmlFor="diff-level" className="text-md text-blue-800 dark:text-blue-500 flex items-center gap-1 mb-3">⭐ Ventaja de Niveles (Global)</label>
                 <div className="flex items-stretch w-full max-w-[200px] bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden focus-within:border-cyan-500/50 transition-colors mb-2">
-                  <button type="button" tabIndex={-1} onClick={(e) => { const input = e.currentTarget.nextElementSibling as HTMLInputElement;input.value = (parseInt(input.value || "0") - 1).toString();}}
+                  <button type="button" tabIndex={-1} onMouseDown={() => handlePressStart("diff-level", -1, -99, 99)} onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd} onTouchStart={() => handlePressStart("diff-level", -1, -99, 99)} onTouchEnd={handlePressEnd}
                   className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">−</button>
-                  <input id="diff-level" name="diff_level" type="text" inputMode="numeric" pattern="-?[0-9]*" defaultValue="0" onInput={(e) => {const target = e.target as HTMLInputElement;target.value = target.value.replace(/[^0-9-]/g, '');}}
+                  <input id="diff-level" name="diff_level" type="text" inputMode="numeric" pattern="-?[0-9]*" defaultValue="0" onInput={(e) => {
+                    const target = e.target as HTMLInputElement;
+                    let val = target.value.replace(/[^0-9-]/g, '');
+                    const startsWithMinus = val.startsWith('-');
+                    val = val.replace(/-/g, '');
+                    if (startsWithMinus) {
+                      val = '-' + val;
+                    }
+                    if (val !== '' && val !== '-') {
+                      const num = parseInt(val, 10);
+                      if (num > 99) val = '99';
+                      if (num < -99) val = '-99';
+                    }
+                    target.value = val;
+                  }}
                   className="flex-1 w-full bg-transparent p-2 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
-                  <button type="button" tabIndex={-1} onClick={(e) => {const input = e.currentTarget.previousElementSibling as HTMLInputElement;input.value = (parseInt(input.value || "0") + 1).toString();}}
+                  <button type="button" tabIndex={-1} onMouseDown={() => handlePressStart("diff-level", 1, -99, 99)} onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd} onTouchStart={() => handlePressStart("diff-level", 1, -99, 99)} onTouchEnd={handlePressEnd}
                   className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">+</button>
                 </div>
                 <span className="text-[12px] text-gray-600 dark:text-gray-500 block text-center leading-tight">Diferencia total sumando las 5 posiciones<br/>Positivo favorece azul, negativo favorece rojo</span>
@@ -446,11 +619,25 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
               <div className="border border-gray-200 dark:border-gray-800 bg-gray-300 dark:bg-[#0A0D14] rounded-xl p-4 flex flex-col items-center justify-center gap-4">
                 <label htmlFor="diff-cs" className="text-md text-green-800 dark:text-green-600 flex items-center gap-1 mb-3">🎯 Diferencia de CS (Farmeo)</label>
                 <div className="flex items-stretch w-full max-w-[200px] bg-white dark:bg-[#0F121C] border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden focus-within:border-cyan-500/50 transition-colors mb-2">
-                  <button type="button" tabIndex={-1} onClick={(e) => { const input = e.currentTarget.nextElementSibling as HTMLInputElement;input.value = (parseInt(input.value || "0") - 1).toString();}}
+                  <button type="button" tabIndex={-1} onMouseDown={() => handlePressStart("diff-cs", -1, -999, 999)} onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd} onTouchStart={() => handlePressStart("diff-cs", -1, -999, 999)} onTouchEnd={handlePressEnd}
                   className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">−</button>
-                  <input id="diff-cs" name="diff_cs" type="text" inputMode="numeric" pattern="-?[0-9]*" defaultValue="0" onInput={(e) => {const target = e.target as HTMLInputElement;target.value = target.value.replace(/[^0-9-]/g, '');}}
+                  <input id="diff-cs" name="diff_cs" type="text" inputMode="numeric" pattern="-?[0-9]*" defaultValue="0" onInput={(e) => {
+                    const target = e.target as HTMLInputElement;
+                    let val = target.value.replace(/[^0-9-]/g, '');
+                    const startsWithMinus = val.startsWith('-');
+                    val = val.replace(/-/g, '');
+                    if (startsWithMinus) {
+                      val = '-' + val;
+                    }
+                    if (val !== '' && val !== '-') {
+                      const num = parseInt(val, 10);
+                      if (num > 999) val = '999';
+                      if (num < -999) val = '-999';
+                    }
+                    target.value = val;
+                  }}
                   className="flex-1 w-full bg-transparent p-2 text-center text-sm font-medium text-gray-800 dark:text-gray-300 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
-                  <button type="button" tabIndex={-1} onClick={(e) => {const input = e.currentTarget.previousElementSibling as HTMLInputElement;input.value = (parseInt(input.value || "0") + 1).toString();}}
+                  <button type="button" tabIndex={-1} onMouseDown={() => handlePressStart("diff-cs", 1, -999, 999)} onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd} onTouchStart={() => handlePressStart("diff-cs", 1, -999, 999)} onTouchEnd={handlePressEnd}
                   className="w-10 text-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors cursor-pointer select-none">+</button>
                 </div>
                 <span className="text-[12px] text-gray-600 dark:text-gray-500 block leading-tight">Positivo favorece azul, negativo favorece rojo</span>

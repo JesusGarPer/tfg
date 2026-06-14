@@ -12,8 +12,13 @@ data/raw/*.csv
 __pycache__/
 *.py[cod]
 
-# Modelos guardados
-models/
-
 # Docker overrides (local settings)
 docker-compose.override.yml
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

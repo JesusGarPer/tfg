@@ -9,9 +9,7 @@ export default function PreMatchPrediction({ onBack, isDark, toggleTheme }: Prop
     <div className="min-h-screen bg-gray-50 dark:bg-[#0A0D14] text-gray-900 dark:text-white p-6 font-sans flex flex-col">
       {/* Volver */}
       <button
-        onClick={onBack}
-        className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer flex items-center gap-2 mb-4 text-sm transition-colors"
-      >
+        onClick={onBack} className="w-max text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer flex items-center gap-2 mb-4 text-sm transition-colors">
         <span>&larr;</span> Volver al Inicio
       </button>
 
