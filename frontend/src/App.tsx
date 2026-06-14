@@ -30,6 +30,8 @@ function App() {
     };
 
     if (showWarning) {
+      // Bloqueamos el scroll del fondo
+      document.body.style.overflow = 'hidden';
       // Escuchamos la tecla ESC a nivel global
       window.addEventListener('keydown', handleKeyDown);
     } else {
