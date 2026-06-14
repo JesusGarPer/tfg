@@ -79,6 +79,10 @@ export default function SearchableSelect({ name, options, placeholder, value, on
               placeholder="Buscar..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
               className="w-full bg-white dark:bg-[#151923] border border-gray-300 dark:border-gray-700 rounded p-1.5 text-xs text-gray-800 dark:text-white outline-none focus:border-cyan-500/50"
             />
           </div>
