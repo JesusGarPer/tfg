@@ -111,7 +111,7 @@ function App() {
           className="relative block w-full text-left flex-1 bg-gray-300 dark:bg-[#0F121C] border border-gray-200 dark:border-purple-500/20 rounded-2xl p-10 hover:border-purple-500/50 transition-all duration-300 hover:shadow-[0_0_40px_rgba(168,85,247,0.1)] cursor-pointer overflow-hidden group focus:outline-none focus:ring-2 focus:ring-purple-500/50 opacity-80 hover:opacity-100"
         >
           {/* Badge de "No disponible" opcional para dar contexto visual antes de clickar */}
-          <div className="absolute top-4 right-4 bg-gray-200 dark:bg-red-800 text-gray-500 dark:text-gray-100 text-xs px-2 py-1 rounded-md font-medium">
+          <div className="absolute top-4 right-4 bg-red-500 dark:bg-red-800 text-dark-100 dark:text-gray-100 text-xs px-2 py-1 rounded-md font-medium">
             Deshabilitado
           </div>
 
