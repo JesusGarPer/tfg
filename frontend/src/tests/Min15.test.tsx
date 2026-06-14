@@ -4,10 +4,13 @@ import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from 'vites
 import Min15Prediction from '../Min15Prediction';
 
 // Simulamos los componentes hijos para aislar la prueba de Min15Prediction
-// Esto evita problemas si SearchableSelect hace cosas complejas con el DOM
+// Esto evita las alertas por datos no rellenados en los selects y nos permite centrarnos en la lógica del componente principal.
 vi.mock('../utils/SearchableSelect', () => ({
-  default: ({ placeholder }: { placeholder: string }) => (
-    <div data-testid="mock-select">{placeholder}</div>
+  default: ({ placeholder, name }: { placeholder: string; name?: string }) => (
+    <div data-testid="mock-select">
+      {placeholder}
+      {name && <input type="hidden" name={name} value="MockValidData" />}
+    </div>
   )
 }));
 
@@ -15,6 +18,9 @@ describe('Componente Min15Prediction', () => {
   // Simulamos la función fetch global
   const mockFetch = vi.fn();
   vi.stubGlobal('fetch', mockFetch);
+
+  // Simulamos la función alert global para evitar pop-ups durante las pruebas
+  vi.stubGlobal('alert', vi.fn());
 
   beforeEach(() => {
     mockFetch.mockReset();
@@ -33,7 +39,7 @@ describe('Componente Min15Prediction', () => {
   });
 
   afterAll(() => {
-    vi.unstubAllGlobals(); // Se libera el fetch solo cuando terminan los 6 tests
+    vi.unstubAllGlobals(); // Se libera el fetch y el alert solo cuando terminan los 6 tests
   });
 
   it('renderiza el título y los elementos principales correctamente', async () => {
@@ -99,8 +105,8 @@ describe('Componente Min15Prediction', () => {
     // Simulamos mantener pulsado el botón
     fireEvent.mouseDown(primerBotonPlus);
 
-    // Avanzamos el tiempo 500 milisegundos de forma instantánea
-    vi.advanceTimersByTime(500);
+    // Avanzamos el tiempo 1000 milisegundos de forma instantánea
+    vi.advanceTimersByTime(1000);
 
     // Soltamos el botón
     fireEvent.mouseUp(primerBotonPlus);
