@@ -238,7 +238,7 @@ export default function Min15Prediction({ onBack, isDark, toggleTheme }: Props) 
     setPrediction(null);
 
     try {
-        const res = await fetch('http://localhost:8000/api/predict-match', {
+        const res = await fetch(`${API_BASE_URL}/api/predict-match`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(payload)
